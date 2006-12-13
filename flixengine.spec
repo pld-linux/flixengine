@@ -7,13 +7,14 @@
 Summary:	On2 Flix Engine
 Name:		flixengine
 Version:	8.0.7.0
-Release:	0.5
+Release:	0.8
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
 Source0:	%{name}linuxdemo.tar.gz
 # Source0-md5:	ea7d3a0efaf08611aad9374259015d71
 NoSource:	0
+Source1:	%{name}.init
 URL:		http://www.on2.com/developer/flix-engine-sdk
 %if %{with autodeps}
 BuildRequires:	ffmpeg-libs
@@ -81,7 +82,9 @@ Perl bindings for On2 Flix Engine.
 
 %package -n php-flixengine
 Summary:	PHP bindings for On2 Flix Engine
+%{?requires_php_extension}
 Group:		Libraries
+Requires:	%{_sysconfdir}/conf.d
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description -n php-flixengine
@@ -177,7 +180,6 @@ cd ..
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 
 ./install.sh \
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
@@ -193,6 +195,8 @@ install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 	--no-init \
 	--noprereqlibs
 
+install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixengine
+
 # install bindings
 cd .flix-engine-installation-files
 # PHP
@@ -200,6 +204,11 @@ cd .flix-engine-installation-files
 	install \
 	PHPINST=$RPM_BUILD_ROOT%{extensionsdir} \
 	-f target.mk
+install -d $RPM_BUILD_ROOT/etc/php/conf.d
+cat <<'EOF' > $RPM_BUILD_ROOT/etc/php/conf.d/flixengine.ini
+; Enable flixengine extension module
+extension=flixengine2.so
+EOF
 
 # Perl
 cd flixperl
@@ -243,6 +252,16 @@ if [ ! -s /var/lib/on2/hostinfo ]; then
 	%{_sbindir}/on2_host_info > /var/lib/on2/hostinfo
 fi
 
+%post -n php-flixengine
+[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
+[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+
+%postun -n php-flixengine
+if [ "$1" = 0 ]; then
+	[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
+	[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+fi
+
 %files
 %defattr(644,root,root,755)
 %doc %{_docdir}/on2
@@ -275,7 +294,7 @@ fi
 
 %files -n java-flixengine
 %defattr(644,root,root,755)
-%{_libdir}/libflixengine2_jni.so
+%attr(755,root,root) %{_libdir}/libflixengine2_jni.so
 %{_javadir}/flixengine2.jar
 
 %files -n perl-flixengine
@@ -289,11 +308,12 @@ fi
 
 %files -n php-flixengine
 %defattr(644,root,root,755)
-%{extensionsdir}/flixengine2.so
+%config(noreplace) %verify(not md5 mtime size) /etc/php/conf.d/flixengine.ini
+%attr(755,root,root) %{extensionsdir}/flixengine2.so
 %{_libdir}/flixengine2.php
 
 %files -n python-flixengine
 %defattr(644,root,root,755)
-%{py_sitedir}/_flixengine2.so
+%attr(755,root,root) %{py_sitedir}/_flixengine2.so
 %{py_sitedir}/flixengine2.pyc
 %{py_sitedir}/flixengine2.pyo
