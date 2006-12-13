@@ -1,8 +1,11 @@
 #!/bin/sh
 #
-# On2 Technologies Flix Engine init script
-# Website: www.on2.com
-# Support: flixsupport@on2.com
+# flixengine   
+#
+# chkconfig:    345 12 88
+#
+# description: On2 Technologies Flix Engine init script
+# processname:  flixd
 
 # Source function library
 . /etc/rc.d/init.d/functions
