@@ -7,7 +7,7 @@
 Summary:	On2 Flix Engine
 Name:		flixengine
 Version:	8.0.7.0
-Release:	0.8
+Release:	0.9
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -26,7 +26,11 @@ BuildRequires:	perl-base
 BuildRequires:	php-devel
 BuildRequires:	python
 BuildRequires:	rpm-perlprov >= 4.1-13
+BuildRequires:	rpmbuild(macros) >= 1.268
+Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	portmap
+Requires:	rc-scripts
 ExclusiveArch:	%{ix86}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -248,8 +252,16 @@ rm -rf $RPM_BUILD_ROOT
 %postun	libs -p /sbin/ldconfig
 
 %post
+/sbin/chkconfig --add %{name}
 if [ ! -s /var/lib/on2/hostinfo ]; then
 	%{_sbindir}/on2_host_info > /var/lib/on2/hostinfo
+fi
+%service %{name} restart
+
+%preun
+if [ "$1" = "0" ]; then
+	%service -q %{name} stop
+	/sbin/chkconfig --del %{name}
 fi
 
 %post -n php-flixengine
