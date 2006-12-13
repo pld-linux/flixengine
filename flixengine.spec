@@ -63,6 +63,38 @@ Group:		Development/Libraries
 %description devel
 Header files for On2 Flix Engine library.
 
+%package -n java-flixengine
+Summary:	Java bindings for On2 Flix Engine
+Group:		Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description -n java-flixengine
+Java bindings for On2 Flix Engine.
+
+%package -n perl-flixengine
+Summary:	Perl bindings for On2 Flix Engine
+Group:		Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description -n perl-flixengine
+Perl bindings for On2 Flix Engine.
+
+%package -n php-flixengine
+Summary:	PHP bindings for On2 Flix Engine
+Group:		Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description -n php-flixengine
+PHP bindings for On2 Flix Engine.
+
+%package -n python-flixengine
+Summary:	Python bindings for On2 Flix Engine
+Group:		Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description -n python-flixengine
+Python bindings for On2 Flix Engine.
+
 %prep
 %setup -q -n flix-engine-installer-linux-%{version}_DEMO
 bin=flix-engine-installer-linux-%{version}_DEMO.bin
@@ -173,6 +205,7 @@ cd .flix-engine-installation-files
 cd flixperl
 %{__make} pure_install \
 	DESTDIR=$RPM_BUILD_ROOT
+rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/auto/On2/flixengine2/.packlist
 cd ..
 
 # Python
@@ -180,6 +213,7 @@ cd flixpython
 %{__python} setup.py install \
 	--optimize=2 \
 	--root=$RPM_BUILD_ROOT
+%py_postclean
 cd ..
 
 # Java
@@ -238,3 +272,28 @@ fi
 %{_examplesdir}/%{name}-%{version}/perl
 %{_examplesdir}/%{name}-%{version}/php
 %{_examplesdir}/%{name}-%{version}/python
+
+%files -n java-flixengine
+%defattr(644,root,root,755)
+%{_libdir}/libflixengine2_jni.so
+%{_javadir}/flixengine2.jar
+
+%files -n perl-flixengine
+%defattr(644,root,root,755)
+%dir %{perl_vendorarch}/On2
+%{perl_vendorarch}/On2/flixengine2.pm
+%dir %{perl_vendorarch}/auto/On2
+%dir %{perl_vendorarch}/auto/On2/flixengine2
+%{perl_vendorarch}/auto/On2/flixengine2/flixengine2.bs
+%attr(755,root,root) %{perl_vendorarch}/auto/On2/flixengine2/flixengine2.so
+
+%files -n php-flixengine
+%defattr(644,root,root,755)
+%{extensionsdir}/flixengine2.so
+%{_libdir}/flixengine2.php
+
+%files -n python-flixengine
+%defattr(644,root,root,755)
+%{py_sitedir}/_flixengine2.so
+%{py_sitedir}/flixengine2.pyc
+%{py_sitedir}/flixengine2.pyo
