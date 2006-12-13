@@ -12,7 +12,7 @@ License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
 Source0:	%{name}linuxdemo.tar.gz
-# Source0-md5:	ea7d3a0efaf08611aad9374259015d71
+# NoSource0-md5:	ea7d3a0efaf08611aad9374259015d71
 NoSource:	0
 Source1:	%{name}.init
 URL:		http://www.on2.com/developer/flix-engine-sdk
