@@ -84,8 +84,8 @@ Perl bindings for On2 Flix Engine.
 Summary:	PHP bindings for On2 Flix Engine
 %{?requires_php_extension}
 Group:		Libraries
-Requires:	%{_sysconfdir}/conf.d
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	/etc/php/conf.d
 
 %description -n php-flixengine
 PHP bindings for On2 Flix Engine.
