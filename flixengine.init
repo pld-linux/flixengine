@@ -1,19 +1,22 @@
 #!/bin/bash
-
+#
 # On2 Technologies Flix Engine init script
 # Website: www.on2.com
 # Support: flixsupport@on2.com
 
-#set some variables
-export PATH=/home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/sbin:/home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/libexec/on2/flixengine:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-export LD_LIBRARY_PATH=/home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/lib:/home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/lib:/lib:/usr/lib:/usr/local/lib:$LIBRARY_PATH
-export C_INCLUDE_PATH=/home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/include:/usr/include:/usr/local/include:$C_INCLUDE_PATH
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# set some variables
+export PATH=/usr/sbin:/usr/libexec/on2/flixengine:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+export LD_LIBRARY_PATH=/usr/lib:/usr/lib:/lib:/usr/lib:/usr/local/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=/usr/include:/usr/include:/usr/local/include:$C_INCLUDE_PATH
 ##Specify the mencoder binary for flixd to use when decoding source files.
 ##If running flixd from the command line or using su within this script to run
 ##it as another user ensure that this environment variable is set. The default
 ##install path for mencoder will not be in PATH so without this variable set
 ##flixd will be unable to decode source files.
-export FLIXD_MENCODER=/home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/libexec/on2/flixengine/mencoder
+export FLIXD_MENCODER=/usr/libexec/on2/flixengine/mencoder
 
 # test for running portmapper
 if ! rpcinfo -p 1>/dev/null 2>&1; then
@@ -38,7 +41,7 @@ if ! rpcinfo -p 1>/dev/null 2>&1; then
 fi
 
 fstart(){
-	/home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/sbin/flixd --authdir=/home/glen/.on2 --pidfile /home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/var/run/flixd.pid     
+	/usr/sbin/flixd --authdir=/home/glen/.on2 --pidfile /usr/var/run/flixd.pid
 	if [ "$?" = "0" ]; then
 		echo "Started Flix Engine."
 		return 0
@@ -49,33 +52,39 @@ fstart(){
 }
 
 fstop(){
-	if [ ! -e /home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/var/run/flixd.pid ]; then
-		echo "PID file /home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/var/run/flixd.pid not found."
+	if [ ! -e /usr/var/run/flixd.pid ]; then
+		echo "PID file /usr/var/run/flixd.pid not found."
 		if [ "$1" = "restart" ]; then
 			echo "Still attempting to restart service."
 		else
 			exit
 		fi
 	else
-		kill `cat /home/glen/tmp/flixengine-8.0.7.0-root-glen/usr/var/run/flixd.pid`
-		if [ "$?" = "0" ]; then 
+		kill `cat /usr/var/run/flixd.pid`
+		if [ "$?" = "0" ]; the
 			echo "Stopped Flix Engine"
 		fi
 	fi
 }
-case $1 in
-        start)
-		fstart
-                ;;
-        stop)
-		fstop
-                ;;
-        restart)
-		fstop
-                sleep 1
-		fstart
-                ;;
-        *)
-                echo "Usage $0 (stop/start/restart)"
-                ;;
+
+RETVAL=0
+# See how we were called.
+case "$1" in
+start)
+	fstart
+	;;
+stop)
+	fstop
+	;;
+restart)
+	fstop
+	sleep 1
+	fstart
+	;;
+*)
+	msg_usage "$0 {start|stop|restart}"
+	exit 3
+	;;
 esac
+
+exit $RETVAL
