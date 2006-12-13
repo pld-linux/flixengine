@@ -1,7 +1,13 @@
+#
+# Conditional build:
+%bcond_without	autodeps	# don't BR packages needed only for resolving deps
+%bcond_with	tests	# perform "make test". needs running flixd on localhost
+#
+%include	/usr/lib/rpm/macros.perl
 Summary:	On2 Flix Engine
 Name:		flixengine
 Version:	8.0.7.0
-Release:	0.2
+Release:	0.5
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -9,18 +15,22 @@ Source0:	%{name}linuxdemo.tar.gz
 # Source0-md5:	ea7d3a0efaf08611aad9374259015d71
 NoSource:	0
 URL:		http://www.on2.com/developer/flix-engine-sdk
-BuildRequires:	bash
+%if %{with autodeps}
 BuildRequires:	ffmpeg-libs
-BuildRequires:	jre
 BuildRequires:	lame-libs
+%endif
+BuildRequires:	bash
+BuildRequires:	jre
 BuildRequires:	perl-base
 BuildRequires:	php-devel
 BuildRequires:	python
+BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	%{name}-libs = %{version}-%{release}
 ExclusiveArch:	%{ix86}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_libexecdir	%{_prefix}/libexec
+%define		extensionsdir	%(php-config --extension-dir 2>/dev/null)
 
 %description
 The On2 Flix Engine provides many of the Flash 8 video encoding
@@ -80,12 +90,58 @@ chmod +x install.sh
 
 cd .flix-engine-installation-files
 %{__sed} -i -e '
+# force installing initscript into buildroot without detection
 s,^initchk$,inittype=sysv1; INITDIR=$RPM_BUILD_ROOT/etc/rc.d/init.d,
+
+# cls is annoying
 s,clear 2>\$nullout,#&,
+
+# we want to install examples, but not compile them in install
+# and somewhy --no-compile didn not work, had to specify also --no-modules,
+# which made no modules installed either, chicken-egg problem.
+s,COMPILEMODULES=y,COMPILEMODULES=n,
+s,INSTALLEDPERLFILES="n",INSTALLEDPERLFILES="y",
+s,INSTALLEDPHPFILES="n",INSTALLEDPHPFILES="y",
+s,INSTALLEDPYTHONFILES="n",INSTALLEDPYTHONFILES="y",
+s,INSTALLEDFLIXLIBRARIES="n",INSTALLEDFLIXLIBRARIES="y",
+s,INSTALLEDJAVAFILES="n",INSTALLEDJAVAFILES="y",
+
 ' install.sh
 
 %build
 cd .flix-engine-installation-files
+
+ln -snf flixhdrs flixengine2
+export C_INCLUDE_PATH=$(pwd)
+
+ldconfig -n flixlibs
+export LD_LIBRARY_PATH=$(pwd)/flixlibs
+export LIBRARY_PATH=$(pwd)/flixlibs
+
+# PHP
+%{__make} -C flixphp \
+	CC="%{__cc}" \
+	-f target.mk \
+
+# Perl
+cd flixperl
+%{__perl} Makefile.PL \
+	INSTALLDIRS=vendor
+%{__make} \
+	CC="%{__cc}" \
+	OPTIMIZE="%{rpmcflags}"
+%{?with_tests:%{__make} test}
+cd ..
+
+# Python
+cd flixpython
+%{__python} setup.py build
+cd ..
+
+# Java
+%{__make} -C flixjava \
+	CC="%{__cc}" \
+	-f target.mk
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -94,15 +150,44 @@ install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 ./install.sh \
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
 	--mandir=$RPM_BUILD_ROOT%{_mandir} \
-	--pidfile=/var/run/flixd.pid \
+	--flixsamples=$RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} \
+	--pidfile=$RPM_BUILD_ROOT/var/run/flixd.pid \
 	--authdir=$RPM_BUILD_ROOT/var/lib/on2 \
 	--just-install \
 	--offline \
 	--yesireadtheon2license \
 	--no-compile \
+	--no-modules \
 	--no-init \
-	--noprereqlibs \
-	--install-all
+	--noprereqlibs
+
+# install bindings
+cd .flix-engine-installation-files
+# PHP
+%{__make} -C flixphp \
+	install \
+	PHPINST=$RPM_BUILD_ROOT%{extensionsdir} \
+	-f target.mk
+
+# Perl
+cd flixperl
+%{__make} pure_install \
+	DESTDIR=$RPM_BUILD_ROOT
+cd ..
+
+# Python
+cd flixpython
+%{__python} setup.py install \
+	--optimize=2 \
+	--root=$RPM_BUILD_ROOT
+cd ..
+
+# Java
+%{__make} -C flixjava \
+	SOINST=$RPM_BUILD_ROOT%{_libdir} \
+	JARINST=$RPM_BUILD_ROOT%{_javadir} \
+	install \
+	-f target.mk
 
 # symlink without buildroot
 ln -snf %{_prefix}/src/flixmodules/flixjava/doc $RPM_BUILD_ROOT%{_docdir}/on2/flixengine/javadoc
@@ -120,7 +205,7 @@ rm -rf $RPM_BUILD_ROOT
 %postun	libs -p /sbin/ldconfig
 
 %post
-if [ -s on2_host_info ]; then
+if [ ! -s /var/lib/on2/hostinfo ]; then
 	%{_sbindir}/on2_host_info > /var/lib/on2/hostinfo
 fi
 
@@ -135,7 +220,6 @@ fi
 %dir /var/lib/on2
 %config(noreplace) %verify(not md5 mtime size) /var/lib/on2/hostinfo
 %{_libexecdir}/on2/flixengine/mencoder
-%{_datadir}/on2
 
 %files libs
 %defattr(644,root,root,755)
@@ -144,5 +228,13 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libflixengine2.so
+%attr(755,root,root) %{_libdir}/libflixengine2_core.so
 %{_includedir}/flixengine2
-%{_prefix}/src/flixmodules
+
+%dir %{_examplesdir}/%{name}-%{version}
+%{_examplesdir}/%{name}-%{version}/c
+%{_examplesdir}/%{name}-%{version}/java
+%{_examplesdir}/%{name}-%{version}/perl
+%{_examplesdir}/%{name}-%{version}/php
+%{_examplesdir}/%{name}-%{version}/python
