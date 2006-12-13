@@ -7,7 +7,7 @@
 Summary:	On2 Flix Engine
 Name:		flixengine
 Version:	8.0.7.0
-Release:	0.9
+Release:	0.12
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -290,6 +290,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libflixengine2.so.*.*
 %attr(755,root,root) %{_libdir}/libflixengine2_core.so.*.*
+%dir %{_examplesdir}/%{name}-%{version}
 
 %files devel
 %defattr(644,root,root,755)
@@ -297,17 +298,13 @@ fi
 %attr(755,root,root) %{_libdir}/libflixengine2_core.so
 %{_includedir}/flixengine2
 
-%dir %{_examplesdir}/%{name}-%{version}
 %{_examplesdir}/%{name}-%{version}/c
-%{_examplesdir}/%{name}-%{version}/java
-%{_examplesdir}/%{name}-%{version}/perl
-%{_examplesdir}/%{name}-%{version}/php
-%{_examplesdir}/%{name}-%{version}/python
 
 %files -n java-flixengine
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libflixengine2_jni.so
 %{_javadir}/flixengine2.jar
+%{_examplesdir}/%{name}-%{version}/java
 
 %files -n perl-flixengine
 %defattr(644,root,root,755)
@@ -317,15 +314,18 @@ fi
 %dir %{perl_vendorarch}/auto/On2/flixengine2
 %{perl_vendorarch}/auto/On2/flixengine2/flixengine2.bs
 %attr(755,root,root) %{perl_vendorarch}/auto/On2/flixengine2/flixengine2.so
+%{_examplesdir}/%{name}-%{version}/perl
 
 %files -n php-flixengine
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/php/conf.d/flixengine.ini
 %attr(755,root,root) %{extensionsdir}/flixengine2.so
 %{_libdir}/flixengine2.php
+%{_examplesdir}/%{name}-%{version}/php
 
 %files -n python-flixengine
 %defattr(644,root,root,755)
 %attr(755,root,root) %{py_sitedir}/_flixengine2.so
 %{py_sitedir}/flixengine2.pyc
 %{py_sitedir}/flixengine2.pyo
+%{_examplesdir}/%{name}-%{version}/python
