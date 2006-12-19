@@ -8,7 +8,7 @@ Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.0
-Release:	0.12
+Release:	0.13
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -23,7 +23,7 @@ BuildRequires:	perl-base
 BuildRequires:	php-devel
 BuildRequires:	python
 BuildRequires:	rpm-perlprov >= 4.1-13
-BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	rpmbuild(macros) >= 1.344
 %if %{with autodeps}
 BuildRequires:	ffmpeg-libs
 BuildRequires:	lame-libs
@@ -37,7 +37,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # FIXME: FHS 2.x violation
 %define		_libexecdir	%{_prefix}/libexec
-%define		extensionsdir	%(php-config --extension-dir 2>/dev/null)
 
 %description
 The On2 Flix Engine provides many of the Flash 8 video encoding
@@ -124,7 +123,7 @@ Summary(pl):	Wi±zania PHP dla silnika On2 Flix
 %{?requires_php_extension}
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	/etc/php/conf.d
+Requires:	php-common >= 4:5.0.4
 
 %description -n php-flixengine
 PHP bindings for On2 Flix Engine.
@@ -248,10 +247,10 @@ cd .flix-engine-installation-files
 # PHP
 %{__make} -C flixphp \
 	install \
-	PHPINST=$RPM_BUILD_ROOT%{extensionsdir} \
+	PHPINST=$RPM_BUILD_ROOT%{php_extensiondir} \
 	-f target.mk
-install -d $RPM_BUILD_ROOT/etc/php/conf.d
-cat <<'EOF' > $RPM_BUILD_ROOT/etc/php/conf.d/flixengine.ini
+install -d $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d
+cat <<'EOF' > $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d/flixengine.ini
 ; Enable flixengine extension module
 extension=flixengine2.so
 EOF
@@ -307,13 +306,11 @@ if [ "$1" = "0" ]; then
 fi
 
 %post -n php-flixengine
-[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
-[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+%php_webserver_restart
 
 %postun -n php-flixengine
 if [ "$1" = 0 ]; then
-	[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
-	[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+	%php_webserver_restart
 fi
 
 %files
@@ -326,7 +323,11 @@ fi
 %{_mandir}/man8/flixd.8*
 %dir /var/lib/on2
 %config(noreplace) %verify(not md5 mtime size) /var/lib/on2/hostinfo
-%{_libexecdir}/on2/flixengine/mencoder
+# TODO: FHS fix
+%dir %{_libexecdir}
+%dir %{_libexecdir}/on2
+%dir %{_libexecdir}/on2/flixengine
+%attr(755,root,root) %{_libexecdir}/on2/flixengine/mencoder
 
 %files libs
 %defattr(644,root,root,755)
@@ -359,8 +360,8 @@ fi
 
 %files -n php-flixengine
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) /etc/php/conf.d/flixengine.ini
-%attr(755,root,root) %{extensionsdir}/flixengine2.so
+%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/flixengine.ini
+%attr(755,root,root) %{php_extensiondir}/flixengine2.so
 %{_libdir}/flixengine2.php
 %{_examplesdir}/%{name}-%{version}/php
 
