@@ -35,6 +35,7 @@ Requires:	rc-scripts
 ExclusiveArch:	%{ix86}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+# FIXME: FHS 2.x violation
 %define		_libexecdir	%{_prefix}/libexec
 %define		extensionsdir	%(php-config --extension-dir 2>/dev/null)
 
