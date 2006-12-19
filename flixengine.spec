@@ -1,10 +1,11 @@
 #
 # Conditional build:
 %bcond_without	autodeps	# don't BR packages needed only for resolving deps
-%bcond_with	tests	# perform "make test". needs running flixd on localhost
+%bcond_with	tests		# perform "make test". needs running flixd on localhost
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	On2 Flix Engine
+Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.0
 Release:	0.12
@@ -16,10 +17,6 @@ Source0:	%{name}linuxdemo.tar.gz
 NoSource:	0
 Source1:	%{name}.init
 URL:		http://www.on2.com/developer/flix-engine-sdk
-%if %{with autodeps}
-BuildRequires:	ffmpeg-libs
-BuildRequires:	lame-libs
-%endif
 BuildRequires:	bash
 BuildRequires:	jre
 BuildRequires:	perl-base
@@ -27,6 +24,10 @@ BuildRequires:	php-devel
 BuildRequires:	python
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.268
+%if %{with autodeps}
+BuildRequires:	ffmpeg-libs
+BuildRequires:	lame-libs
+%endif
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	portmap
@@ -54,38 +55,71 @@ Server, or imported into Flash Studio. The new FLV output also is
 fully compliant with FLV format metadata and Adobe Flash Player
 standards.
 
+%description -l pl
+Silnik On2 Flix Engine udostêpnia wiele spo¶ród mo¿liwo¶ci kodowania
+filmów Flash 8 wiod±cego kodera On2 Flix Pro w postaci potê¿nego SDK.
+
+Silnik pozwala wykorzystywaæ mo¿liwo¶ci i wydajno¶æ filmów Flash z
+kodowaniem On2 VP6 w intranecie, na stronie WWW i w innych
+zastosowaniach serwerowych, z zachowaniem kana³u alpha na wyj¶ciu
+obrazu i innymi opcjami.
+
+G³ówn± cech± silnika On2 Flix Engine 8 jest obs³uga filmów Adobe Flash
+8 z kodekiem On2 VP6 oraz wyj¶ciem obrazu FLV, które mo¿na odtwarzaæ
+bezpo¶rednio w odtwarzaczu Flash, przekazywaæ strumieniem poprzez
+Adobe Flash Media Server lub importowaæ do Flash Studio. Nowe wyj¶cie
+FLV jest tak¿e w pe³ni zgodne z formatem metadanych FLV i standardami
+Adobe Flash Playera.
+
 %package libs
 Summary:	Shared libraries for On2 Flix Engine
+Summary(pl):	Biblioteki wspó³dzielone silnika On2 Flix
 Group:		Libraries
 
 %description libs
 Shared libraries for On2 Flix Engine.
 
+%description libs -l pl
+Biblioteki wspó³dzielone silnika On2 Flix.
+
 %package devel
 Summary:	Header files for On2 Flix Engine library
+Summary(pl):	Pliki nag³ówkowe biblioteki silnika On2 Flix
 Group:		Development/Libraries
 
 %description devel
 Header files for On2 Flix Engine library.
 
+%description devel -l pl
+Pliki nag³ówkowe biblioteki silnika On2 Flix.
+
 %package -n java-flixengine
 Summary:	Java bindings for On2 Flix Engine
+Summary(pl):	Wi±zania Javy dla silnika On2 Flix
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description -n java-flixengine
 Java bindings for On2 Flix Engine.
 
+%description -n java-flixengine -l pl
+Wi±zania Javy dla silnika On2 Flix.
+
 %package -n perl-flixengine
 Summary:	Perl bindings for On2 Flix Engine
+Summary(pl):	Wi±zania perla dla silnika On2 Flix
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description -n perl-flixengine
 Perl bindings for On2 Flix Engine.
 
+%description -n perl-flixengine -l pl
+Wi±zania perla dla silnika On2 Flix.
+
 %package -n php-flixengine
 Summary:	PHP bindings for On2 Flix Engine
+Summary(pl):	Wi±zania PHP dla silnika On2 Flix
 %{?requires_php_extension}
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
@@ -94,13 +128,20 @@ Requires:	/etc/php/conf.d
 %description -n php-flixengine
 PHP bindings for On2 Flix Engine.
 
+%description -n php-flixengine -l pl
+Wi±zania PHP dla silnika On2 Flix.
+
 %package -n python-flixengine
 Summary:	Python bindings for On2 Flix Engine
+Summary(pl):	Wi±zania Pythona dla silnika On2 Flix
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description -n python-flixengine
 Python bindings for On2 Flix Engine.
+
+%description -n python-flixengine -l pl
+Wi±zania Pythona dla silnika On2 Flix.
 
 %prep
 %setup -q -n flix-engine-installer-linux-%{version}_DEMO
@@ -160,7 +201,7 @@ export LIBRARY_PATH=$(pwd)/flixlibs
 # PHP
 %{__make} -C flixphp \
 	CC="%{__cc}" \
-	-f target.mk \
+	-f target.mk
 
 # Perl
 cd flixperl
@@ -297,7 +338,6 @@ fi
 %attr(755,root,root) %{_libdir}/libflixengine2.so
 %attr(755,root,root) %{_libdir}/libflixengine2_core.so
 %{_includedir}/flixengine2
-
 %{_examplesdir}/%{name}-%{version}/c
 
 %files -n java-flixengine
