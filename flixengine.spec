@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
-Release:	0.7
+Release:	0.8
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -264,7 +264,7 @@ rm -rf $RPM_BUILD_ROOT
 	--no-init \
 	--noprereqlibs
 
-install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixengine
+install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixd
 
 cd .flix-engine-installation-files
 
@@ -326,7 +326,7 @@ rm -rf $RPM_BUILD_ROOT
 %postun	libs -p /sbin/ldconfig
 
 %post
-/sbin/chkconfig --add %{name}
+/sbin/chkconfig --add flixd
 if [ ! -s /var/lib/on2/hostinfo ]; then
 	%{_sbindir}/on2_host_info > /var/lib/on2/hostinfo
 %banner -e %{name} <<EOF
@@ -334,12 +334,12 @@ To register your copy of flixd invoke:
 # %{_sbindir}/lget -u '<username>' -s '<serial>' -i /var/lib/on2/hostinfo -o /var/lib/on2/on2product.lic -a 'On2FlixEngine/%{version}_DEMO (%(uname -o))'
 EOF
 fi
-%service %{name} restart
+%service flixd restart
 
 %preun
 if [ "$1" = "0" ]; then
-	%service -q %{name} stop
-	/sbin/chkconfig --del %{name}
+	%service -q flixd stop
+	/sbin/chkconfig --del flixd
 fi
 
 %post -n php-flixengine
@@ -357,7 +357,7 @@ fi
 %attr(755,root,root) %{_sbindir}/flixd
 %attr(755,root,root) %{_sbindir}/lget
 %attr(755,root,root) %{_sbindir}/on2_host_info
-%attr(754,root,root) /etc/rc.d/init.d/flixengine
+%attr(754,root,root) /etc/rc.d/init.d/flixd
 %{_mandir}/man8/flixd.8*
 %dir /var/lib/on2
 %config(noreplace) %verify(not md5 mtime size) /var/lib/on2/hostinfo
