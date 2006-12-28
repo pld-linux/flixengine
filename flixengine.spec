@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
-Release:	0.8
+Release:	0.10
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -222,7 +222,6 @@ export LIBRARY_PATH=$LD_LIBRARY_PATH
 
 # PHP
 %{__make} -C flixphp \
-	LIBDIR=$LIBRARY_PATH \
 	CC="%{__cc}" \
 	-f target.mk
 
