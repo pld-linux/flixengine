@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
-Release:	0.6
+Release:	0.7
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -150,6 +150,13 @@ Python bindings for On2 Flix Engine.
 
 %description -n python-flixengine -l pl
 Wi±zania Pythona dla silnika On2 Flix.
+
+%package docs
+Summary:	HTML Documentation for On2 Flix Engine
+Group:		Documentation
+
+%description docs
+HTML Documentation for On2 Flix Engine
 
 %prep
 %setup -q -n flix-engine-installer-linux-%{version}_DEMO
@@ -290,6 +297,7 @@ cd flixpython
 cd ..
 %endif
 
+rm -f $RPM_BUILD_ROOT%{_docdir}/on2/flixengine/javadoc
 %if %{with java}
 %{__make} -C flixjava \
 	SOINST=$RPM_BUILD_ROOT%{_libdir} \
@@ -344,9 +352,8 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc %{_docdir}/on2
 %doc doc/*
-%exclude %{_docdir}/on2/flixengine/javadoc
+%{?with_java:%exclude %{_docdir}/on2/flixengine/javadoc}
 %attr(755,root,root) %{_sbindir}/flixd
 %attr(755,root,root) %{_sbindir}/lget
 %attr(755,root,root) %{_sbindir}/on2_host_info
@@ -413,3 +420,7 @@ fi
 %{py_sitedir}/flixengine2.pyo
 %{_examplesdir}/%{name}-%{version}/python
 %endif
+
+%files docs
+%defattr(644,root,root,755)
+%doc %{_docdir}/on2
