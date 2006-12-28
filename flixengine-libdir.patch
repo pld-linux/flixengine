@@ -1,0 +1,11 @@
+--- flix-engine-installer-linux-8.0.7.1_DEMO/.flix-engine-installation-files/flixphp/target.mk~	2006-11-21 23:21:02.000000000 +0200
++++ flix-engine-installer-linux-8.0.7.1_DEMO/.flix-engine-installation-files/flixphp/target.mk	2006-12-28 19:21:30.369596285 +0200
+@@ -25,7 +25,7 @@
+ PHPINST := $(shell php-config --extension-dir)
+ $(PHPWRAP_SO): $(PHPWRAP_C)
+ 	$(CC) $(CFLAGS) $(PHPINCS) -shared $(PHPWRAP_C) \
+-              -lflixengine2 -o $(PHPWRAP_SO) 
++             -L$(LIBDIR) -lflixengine2 -o $(PHPWRAP_SO) 
+ 
+ install:
+ 	mkdir -p $(PHPINST)
