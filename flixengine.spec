@@ -1,8 +1,8 @@
 #
 # Conditional build:
 %bcond_without	autodeps	# don't BR packages needed only for resolving deps
-%bcond_with		python	# do not build Python bindings
-%bcond_with		java	# do not build Java bindings
+%bcond_without		python	# do not build Python bindings
+%bcond_without		java	# do not build Java bindings
 %bcond_with	tests		# perform "make test". needs running flixd on localhost
 #
 %ifarch %{x8664}
@@ -218,10 +218,11 @@ ldconfig -n testing/lib64
 export LD_LIBRARY_PATH=$(pwd)/flixlibs
 ldconfig -n flixlibs
 %endif
+export LIBRARY_PATH=$LD_LIBRARY_PATH
 
 # PHP
 %{__make} -C flixphp \
-	LIBDIR=$LD_LIBRARY_PATH \
+	LIBDIR=$LIBRARY_PATH \
 	CC="%{__cc}" \
 	-f target.mk
 
