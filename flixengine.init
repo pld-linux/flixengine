@@ -38,6 +38,7 @@ start(){
 		/usr/sbin/flixd --authdir=$AUTHDIR --pidfile /var/run/flixd.pid
 		RETVAL=$?
 		if [ $RETVAL = 0 ]; then
+			touch /var/lock/subsys/flixd
 			ok
 		else
 			fail
@@ -50,7 +51,9 @@ start(){
 stop() {
 	# Stop daemons.
 	if [ -f /var/lock/subsys/flixd ]; then
+		msg_stopping "Flix Engine"
 		killproc --pidfile flixd.pid flixd
+		rm -f /var/lock/subsys/flixd
 	else
 		msg_not_running "Flix Engine"
 	fi
