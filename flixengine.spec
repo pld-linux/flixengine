@@ -1,14 +1,21 @@
 #
 # Conditional build:
 %bcond_without	autodeps	# don't BR packages needed only for resolving deps
+%bcond_with		python	# do not build Python bindings
+%bcond_with		java	# do not build Java bindings
 %bcond_with	tests		# perform "make test". needs running flixd on localhost
+#
+%ifarch %{x8664}
+%undefine	with_python
+%undefine	with_java
+%endif
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
-Release:	0.3
+Release:	0.4
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -16,12 +23,13 @@ Source0:	%{name}linuxdemo.tar.gz
 # NoSource0-md5:	fb7cc89ce2689d3c43434291620cfd0f
 NoSource:	0
 Source1:	%{name}.init
+Patch0:		%{name}-libdir.patch
 URL:		http://www.on2.com/developer/flix-engine-sdk
 BuildRequires:	bash
-BuildRequires:	jre
+%{?with_java:BuildRequires:	jre}
 BuildRequires:	perl-base
 BuildRequires:	php-devel
-BuildRequires:	python
+%{?with_python:BuildRequires:	python}
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.344
 %if %{with autodeps}
@@ -32,7 +40,7 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	portmap
 Requires:	rc-scripts
-ExclusiveArch:	%{ix86}
+ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # FIXME: FHS 2.x violation
@@ -152,6 +160,8 @@ OFFSET=$( awk -F= '/OFFSET=/{print $2; exit}' $bin)
 dd bs=8 if=$bin of=$tar skip=$OFFSET
 %{__tar} zxf $tar
 
+%patch0 -p1
+
 %{__sed} -ne '/## FUNCTIONS common/,/## END - common function/p' $bin > functions.sh
 cat <<'EOF' > install.sh
 #!/bin/bash
@@ -194,12 +204,17 @@ cd .flix-engine-installation-files
 ln -snf flixhdrs flixengine2
 export C_INCLUDE_PATH=$(pwd)
 
-ldconfig -n flixlibs
+%ifarch %{x8664}
+export LD_LIBRARY_PATH=$(pwd)/testing/lib64
+ldconfig -n testing/lib64
+%else
 export LD_LIBRARY_PATH=$(pwd)/flixlibs
-export LIBRARY_PATH=$(pwd)/flixlibs
+ldconfig -n flixlibs
+%endif
 
 # PHP
 %{__make} -C flixphp \
+	LIBDIR=$LD_LIBRARY_PATH \
 	CC="%{__cc}" \
 	-f target.mk
 
@@ -213,15 +228,17 @@ cd flixperl
 %{?with_tests:%{__make} test}
 cd ..
 
-# Python
+%if %{with python}
 cd flixpython
 %{__python} setup.py build
 cd ..
+%endif
 
-# Java
+%if %{with java}
 %{__make} -C flixjava \
 	CC="%{__cc}" \
 	-f target.mk
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -242,8 +259,9 @@ rm -rf $RPM_BUILD_ROOT
 
 install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixengine
 
-# install bindings
 cd .flix-engine-installation-files
+
+# install bindings
 # PHP
 %{__make} -C flixphp \
 	install \
@@ -262,15 +280,16 @@ cd flixperl
 rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/auto/On2/flixengine2/.packlist
 cd ..
 
-# Python
+%if %{with python}
 cd flixpython
 %{__python} setup.py install \
 	--optimize=2 \
 	--root=$RPM_BUILD_ROOT
 %py_postclean
 cd ..
+%endif
 
-# Java
+%if %{with java}
 %{__make} -C flixjava \
 	SOINST=$RPM_BUILD_ROOT%{_libdir} \
 	JARINST=$RPM_BUILD_ROOT%{_javadir} \
@@ -279,6 +298,11 @@ cd ..
 
 # symlink without buildroot
 ln -snf %{_prefix}/src/flixmodules/flixjava/doc $RPM_BUILD_ROOT%{_docdir}/on2/flixengine/javadoc
+%endif
+
+%ifarch %{x8664}
+cp -a testing/lib64/libflixengine2.so* $RPM_BUILD_ROOT%{_libdir}
+%endif
 
 # do not put hardware fingerprint to rpm package
 > $RPM_BUILD_ROOT/var/lib/on2/hostinfo
@@ -319,7 +343,8 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc %{_docdir}/on2 doc/*
+%doc %{_docdir}/on2
+%doc doc/*
 %exclude %{_docdir}/on2/flixengine/javadoc
 %attr(755,root,root) %{_sbindir}/flixd
 %attr(755,root,root) %{_sbindir}/lget
@@ -336,23 +361,31 @@ fi
 
 %files libs
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_prefix}/lib/libflixengine2.so.*.*
+%attr(755,root,root) %{_prefix}/lib/libflixengine2_core.so.*.*
+%ifarch %{x8664}
 %attr(755,root,root) %{_libdir}/libflixengine2.so.*.*
-%attr(755,root,root) %{_libdir}/libflixengine2_core.so.*.*
+%endif
 %dir %{_examplesdir}/%{name}-%{version}
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_prefix}/lib/libflixengine2.so
+%attr(755,root,root) %{_prefix}/lib/libflixengine2_core.so
+%ifarch %{x8664}
 %attr(755,root,root) %{_libdir}/libflixengine2.so
-%attr(755,root,root) %{_libdir}/libflixengine2_core.so
+%endif
 %{_includedir}/flixengine2
 %{_examplesdir}/%{name}-%{version}/c
 
+%if %{with java}
 %files -n java-flixengine
 %defattr(644,root,root,755)
 %doc %{_docdir}/on2/flixengine/javadoc
 %attr(755,root,root) %{_libdir}/libflixengine2_jni.so
 %{_javadir}/flixengine2.jar
 %{_examplesdir}/%{name}-%{version}/java
+%endif
 
 %files -n perl-flixengine
 %defattr(644,root,root,755)
@@ -371,9 +404,11 @@ fi
 %{_libdir}/flixengine2.php
 %{_examplesdir}/%{name}-%{version}/php
 
+%if %{with python}
 %files -n python-flixengine
 %defattr(644,root,root,755)
 %attr(755,root,root) %{py_sitedir}/_flixengine2.so
 %{py_sitedir}/flixengine2.pyc
 %{py_sitedir}/flixengine2.pyo
 %{_examplesdir}/%{name}-%{version}/python
+%endif
