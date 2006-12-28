@@ -7,13 +7,13 @@
 Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.7.0
-Release:	0.14
+Version:	8.0.7.1
+Release:	0.1
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
 Source0:	%{name}linuxdemo.tar.gz
-# NoSource0-md5:	ea7d3a0efaf08611aad9374259015d71
+# NoSource0-md5:	fb7cc89ce2689d3c43434291620cfd0f
 NoSource:	0
 Source1:	%{name}.init
 URL:		http://www.on2.com/developer/flix-engine-sdk
@@ -296,6 +296,10 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/chkconfig --add %{name}
 if [ ! -s /var/lib/on2/hostinfo ]; then
 	%{_sbindir}/on2_host_info > /var/lib/on2/hostinfo
+%banner -e %{name} <<EOF
+To register your copy of flixd invoke:
+# %{_sbindir}/lget -u '<username>' -s '<serial>' -i /var/lib/on2/hostinfo -o /var/lib/on2/on2product.lic
+EOF
 fi
 %service %{name} restart
 
