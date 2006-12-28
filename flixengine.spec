@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
-Release:	0.4
+Release:	0.6
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -265,7 +265,8 @@ cd .flix-engine-installation-files
 # PHP
 %{__make} -C flixphp \
 	install \
-	PHPINST=$RPM_BUILD_ROOT%{php_extensiondir} \
+	PHPINST=%{php_extensiondir} \
+	DESTDIR=$RPM_BUILD_ROOT \
 	-f target.mk
 install -d $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d
 cat <<'EOF' > $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d/flixengine.ini
@@ -401,7 +402,7 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/flixengine.ini
 %attr(755,root,root) %{php_extensiondir}/flixengine2.so
-%{_libdir}/flixengine2.php
+%{_prefix}/lib/flixengine2.php
 %{_examplesdir}/%{name}-%{version}/php
 
 %if %{with python}
