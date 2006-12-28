@@ -70,8 +70,12 @@ restart)
 	sleep 1
 	start
 	;;
+status)
+	status flixd
+	RETVAL=$?
+	;;
 *)
-	msg_usage "$0 {start|stop|restart}"
+	msg_usage "$0 {start|stop|restart|status}"
 	exit 3
 	;;
 esac
