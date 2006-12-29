@@ -24,6 +24,7 @@ Source0:	%{name}linuxdemo.tar.gz
 NoSource:	0
 Source1:	%{name}.init
 Patch0:		%{name}-libdir.patch
+Patch1:		%{name}-phploader.patch
 URL:		http://www.on2.com/developer/flix-engine-sdk
 BuildRequires:	bash
 %{?with_java:BuildRequires:	jre}
@@ -166,6 +167,7 @@ dd bs=8 if=$bin of=$tar skip=$OFFSET
 %{__tar} zxf $tar
 
 %patch0 -p1
+%patch1 -p1
 
 %{__sed} -ne '/## FUNCTIONS common/,/## END - common function/p' $bin > functions.sh
 cat <<'EOF' > install.sh
