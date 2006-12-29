@@ -36,7 +36,7 @@ start(){
 		check_portmap
 		msg_starting "Flix Engine"
 		/usr/sbin/flixd --authdir=$AUTHDIR \
-			--interface=$INTERFACE --port=$PORT \
+			--interface=$INTERFACE --port=$PORT --reuseaddr \
 			--pidfile /var/run/flixd.pid --logfile=/var/log/flixd.log
 		RETVAL=$?
 		if [ $RETVAL = 0 ]; then
