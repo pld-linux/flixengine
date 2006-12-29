@@ -10,14 +10,12 @@
 # Source function library
 . /etc/rc.d/init.d/functions
 
-# set some variables
-export PATH=$PATH:/usr/libexec/on2/flixengine
 ## Specify the mencoder binary for flixd to use when decoding source files.
 ## If running flixd from the command line or using su within this script to run
 ## it as another user ensure that this environment variable is set. The default
 ## install path for mencoder will not be in PATH so without this variable set
 ## flixd will be unable to decode source files.
-export FLIXD_MENCODER=/usr/libexec/on2/flixengine/mencoder
+export FLIXD_MENCODER=/usr/bin/mencoder-flixengine
 
 AUTHDIR=/var/lib/on2
 

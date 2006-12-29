@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
-Release:	0.10
+Release:	0.11
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -43,9 +43,6 @@ Conflicts:	%{name}-libs < %{version}-%{release}
 Conflicts:	%{name}-libs > %{version}-%{release}
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-# FIXME: FHS 2.x violation
-%define		_libexecdir	%{_prefix}/libexec
 
 %description
 The On2 Flix Engine provides many of the Flash 8 video encoding
@@ -254,6 +251,7 @@ rm -rf $RPM_BUILD_ROOT
 ./install.sh \
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
 	--mandir=$RPM_BUILD_ROOT%{_mandir} \
+	--mencoderbin=$RPM_BUILD_ROOT%{_bindir} \
 	--flixsamples=$RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} \
 	--pidfile=$RPM_BUILD_ROOT/var/run/flixd.pid \
 	--authdir=$RPM_BUILD_ROOT/var/lib/on2 \
@@ -314,6 +312,9 @@ ln -snf %{_prefix}/src/flixmodules/flixjava/doc $RPM_BUILD_ROOT%{_docdir}/on2/fl
 cp -a testing/lib64/libflixengine2.so* $RPM_BUILD_ROOT%{_libdir}
 %endif
 
+# avoid collision from mplayer package
+mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
+
 # do not put hardware fingerprint to rpm package
 > $RPM_BUILD_ROOT/var/lib/on2/hostinfo
 
@@ -362,11 +363,7 @@ fi
 %{_mandir}/man8/flixd.8*
 %dir /var/lib/on2
 %config(noreplace) %verify(not md5 mtime size) /var/lib/on2/hostinfo
-# TODO: FHS fix
-%dir %{_libexecdir}
-%dir %{_libexecdir}/on2
-%dir %{_libexecdir}/on2/flixengine
-%attr(755,root,root) %{_libexecdir}/on2/flixengine/mencoder
+%attr(755,root,root) %{_bindir}/mencoder-flixengine
 
 %files libs
 %defattr(644,root,root,755)
