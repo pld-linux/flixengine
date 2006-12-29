@@ -37,9 +37,10 @@ BuildRequires:	ffmpeg-libs
 BuildRequires:	lame-libs
 %endif
 Requires(post,preun):	/sbin/chkconfig
-Requires:	%{name}-libs = %{version}-%{release}
 Requires:	portmap
 Requires:	rc-scripts
+Conflicts:	%{name}-libs < %{version}-%{release}
+Conflicts:	%{name}-libs > %{version}-%{release}
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
