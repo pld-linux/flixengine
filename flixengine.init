@@ -18,7 +18,8 @@
 export FLIXD_MENCODER=/usr/bin/mencoder-flixengine
 
 AUTHDIR=/var/lib/on2
-PORT=705
+PORT=2372
+USERID=flixd
 INTERFACE=lo
 
 check_portmap() {
@@ -35,16 +36,11 @@ start(){
 	if [ ! -f /var/lock/subsys/flixd ]; then
 		check_portmap
 		msg_starting "Flix Engine"
-		/usr/sbin/flixd --authdir=$AUTHDIR \
+		daemon --user $USERID /usr/sbin/flixd --authdir=$AUTHDIR \
 			--interface=$INTERFACE --port=$PORT --reuseaddr \
-			--pidfile /var/run/flixd.pid --logfile=/var/log/flixd.log
+			--pidfile /var/run/flixd/flixd.pid --logfile=/var/log/flixd.log
 		RETVAL=$?
-		if [ $RETVAL = 0 ]; then
-			touch /var/lock/subsys/flixd
-			ok
-		else
-			fail
-		fi
+		[ $RETVAL = 0 ] && touch /var/lock/subsys/flixd
 	else
 		msg_already_running "Flix Engine"
 	fi
@@ -54,7 +50,7 @@ stop() {
 	# Stop daemons.
 	if [ -f /var/lock/subsys/flixd ]; then
 		msg_stopping "Flix Engine"
-		killproc --pidfile flixd.pid flixd
+		killproc --pidfile flixd/flixd.pid flixd
 		rm -f /var/lock/subsys/flixd
 	else
 		msg_not_running "Flix Engine"
