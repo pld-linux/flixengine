@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
-Release:	0.11
+Release:	0.12
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -38,8 +38,16 @@ BuildRequires:	ffmpeg-libs
 BuildRequires:	lame-libs
 %endif
 Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
 Requires:	portmap
 Requires:	rc-scripts
+Provides:	group(flixd)
+Provides:	user(flixd)
 Conflicts:	%{name}-libs < %{version}-%{release}
 Conflicts:	%{name}-libs > %{version}-%{release}
 ExclusiveArch:	%{ix86} %{x8664}
@@ -255,7 +263,7 @@ rm -rf $RPM_BUILD_ROOT
 	--mandir=$RPM_BUILD_ROOT%{_mandir} \
 	--mencoderbin=$RPM_BUILD_ROOT%{_bindir} \
 	--flixsamples=$RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} \
-	--pidfile=$RPM_BUILD_ROOT/var/run/flixd.pid \
+	--pidfile=$RPM_BUILD_ROOT/var/run/flixd/flixd.pid \
 	--authdir=$RPM_BUILD_ROOT/var/lib/on2 \
 	--just-install \
 	--offline \
@@ -319,6 +327,10 @@ mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
 
 # do not put hardware fingerprint to rpm package
 > $RPM_BUILD_ROOT/var/lib/on2/hostinfo
+touch $RPM_BUILD_ROOT/var/lib/on2/flixengine.lic
+install -d $RPM_BUILD_ROOT/var/run/flixd
+install -d $RPM_BUILD_ROOT/var/log
+touch $RPM_BUILD_ROOT/var/log/flixd.log
 
 # use poldek -e
 rm -f $RPM_BUILD_ROOT%{_sbindir}/flix-engine-uninstall.sh
@@ -326,11 +338,17 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/flix-engine-uninstall.sh
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	libs -p /sbin/ldconfig
-%postun	libs -p /sbin/ldconfig
+%pre
+%groupadd -g 179 flixd
+%useradd -u 179 -g flixd -c "On2 Flixd" flixd
 
 %post
 /sbin/chkconfig --add flixd
+if [ ! -f /var/log/flixd.log ]; then
+	touch /var/log/flixd.log
+	chown root:flixd /var/log/flixd.log
+	chmod 660 /var/log/flixd.log
+fi
 if [ ! -s /var/lib/on2/hostinfo ]; then
 	%{_sbindir}/on2_host_info > /var/lib/on2/hostinfo
 %banner -e %{name} <<EOF
@@ -345,6 +363,15 @@ if [ "$1" = "0" ]; then
 	%service -q flixd stop
 	/sbin/chkconfig --del flixd
 fi
+
+%postun
+if [ "$1" = "0" ]; then
+	%userremove flixd
+	%groupremove flixd
+fi
+
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %post -n php-flixengine
 %php_webserver_restart
@@ -364,7 +391,10 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/flixd
 %{_mandir}/man8/flixd.8*
 %dir /var/lib/on2
-%config(noreplace) %verify(not md5 mtime size) /var/lib/on2/hostinfo
+%dir %attr(771,root,flixd) /var/run/flixd
+%ghost %attr(660,root,flixd) /var/log/flixd.log
+%attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) /var/lib/on2/hostinfo
+%attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) /var/lib/on2/flixengine.lic
 %attr(755,root,root) %{_bindir}/mencoder-flixengine
 
 %files libs
