@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
-Release:	0.12
+Release:	0.13
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -48,8 +48,6 @@ Requires:	portmap
 Requires:	rc-scripts
 Provides:	group(flixd)
 Provides:	user(flixd)
-Conflicts:	%{name}-libs < %{version}-%{release}
-Conflicts:	%{name}-libs > %{version}-%{release}
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
