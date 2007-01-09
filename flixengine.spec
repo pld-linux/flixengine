@@ -19,6 +19,7 @@ Release:	0.13
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
+# check for newer versions at http://flix.on2.com/download
 Source0:	%{name}linuxdemo.tar.gz
 # NoSource0-md5:	fb7cc89ce2689d3c43434291620cfd0f
 NoSource:	0
