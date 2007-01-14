@@ -1,8 +1,8 @@
 #
 # Conditional build:
 %bcond_without	autodeps	# don't BR packages needed only for resolving deps
-%bcond_without		python	# do not build Python bindings
-%bcond_without		java	# do not build Java bindings
+%bcond_without	python		# do not build Python bindings
+%bcond_without	java		# do not build Java bindings
 %bcond_with	tests		# perform "make test". needs running flixd on localhost
 #
 %ifarch %{x8664}
@@ -159,10 +159,14 @@ Wi±zania Pythona dla silnika On2 Flix.
 
 %package docs
 Summary:	HTML Documentation for On2 Flix Engine
+Summary(pl):	Dokumentacja HTML dla silnika On2 Flix
 Group:		Documentation
 
 %description docs
-HTML Documentation for On2 Flix Engine
+HTML Documentation for On2 Flix Engine.
+
+%description docs -l pl
+Dokumentacja HTML dla silnika On2 Flix.
 
 %prep
 %setup -q -n flix-engine-installer-linux-%{version}_DEMO
