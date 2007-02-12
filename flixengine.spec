@@ -12,7 +12,7 @@
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	On2 Flix Engine
-Summary(pl.UTF-8):   Silnik On2 Flix
+Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.7.1
 Release:	0.13
@@ -87,7 +87,7 @@ Adobe Flash Playera.
 
 %package libs
 Summary:	Shared libraries for On2 Flix Engine
-Summary(pl.UTF-8):   Biblioteki współdzielone silnika On2 Flix
+Summary(pl.UTF-8):	Biblioteki współdzielone silnika On2 Flix
 Group:		Libraries
 
 %description libs
@@ -98,7 +98,7 @@ Biblioteki współdzielone silnika On2 Flix.
 
 %package devel
 Summary:	Header files for On2 Flix Engine library
-Summary(pl.UTF-8):   Pliki nagłówkowe biblioteki silnika On2 Flix
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki silnika On2 Flix
 Group:		Development/Libraries
 
 %description devel
@@ -109,7 +109,7 @@ Pliki nagłówkowe biblioteki silnika On2 Flix.
 
 %package -n java-flixengine
 Summary:	Java bindings for On2 Flix Engine
-Summary(pl.UTF-8):   Wiązania Javy dla silnika On2 Flix
+Summary(pl.UTF-8):	Wiązania Javy dla silnika On2 Flix
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
@@ -121,7 +121,7 @@ Wiązania Javy dla silnika On2 Flix.
 
 %package -n perl-flixengine
 Summary:	Perl bindings for On2 Flix Engine
-Summary(pl.UTF-8):   Wiązania perla dla silnika On2 Flix
+Summary(pl.UTF-8):	Wiązania perla dla silnika On2 Flix
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
@@ -133,7 +133,7 @@ Wiązania perla dla silnika On2 Flix.
 
 %package -n php-flixengine
 Summary:	PHP bindings for On2 Flix Engine
-Summary(pl.UTF-8):   Wiązania PHP dla silnika On2 Flix
+Summary(pl.UTF-8):	Wiązania PHP dla silnika On2 Flix
 %{?requires_php_extension}
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
@@ -147,7 +147,7 @@ Wiązania PHP dla silnika On2 Flix.
 
 %package -n python-flixengine
 Summary:	Python bindings for On2 Flix Engine
-Summary(pl.UTF-8):   Wiązania Pythona dla silnika On2 Flix
+Summary(pl.UTF-8):	Wiązania Pythona dla silnika On2 Flix
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
@@ -159,7 +159,7 @@ Wiązania Pythona dla silnika On2 Flix.
 
 %package docs
 Summary:	HTML Documentation for On2 Flix Engine
-Summary(pl.UTF-8):   Dokumentacja HTML dla silnika On2 Flix
+Summary(pl.UTF-8):	Dokumentacja HTML dla silnika On2 Flix
 Group:		Documentation
 
 %description docs
