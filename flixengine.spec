@@ -14,14 +14,14 @@
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.7.1
-Release:	0.13
+Version:	8.0.8.0
+Release:	0.1
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
 # check for newer versions at http://flix.on2.com/download
-Source0:	%{name}linuxdemo.tar.gz
-# NoSource0-md5:	fb7cc89ce2689d3c43434291620cfd0f
+Source0:	%{name}linuxdemo-%{version}.tar.gz
+# NoSource0-md5:	c99b1034b9797bc97d151b1e33ac6df7
 NoSource:	0
 Source1:	%{name}.init
 Patch0:		%{name}-libdir.patch
@@ -280,6 +280,9 @@ install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixd
 
 cd .flix-engine-installation-files
 
+# symlink without buildroot
+ln -snf %{_docdir}/on2/flixengine/html/c/cli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/c/README-cli.html
+
 # install bindings
 # PHP
 %{__make} -C flixphp \
@@ -292,6 +295,9 @@ cat <<'EOF' > $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d/flixengine.ini
 ; Enable flixengine extension module
 extension=flixengine2.so
 EOF
+# symlink without buildroot
+ln -snf %{_docdir}/on2/flixengine/html/phpcgi.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-cgi.html
+ln -snf %{_docdir}/on2/flixengine/html/phpcli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-cli.html
 
 # Perl
 cd flixperl
@@ -299,6 +305,9 @@ cd flixperl
 	DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/auto/On2/flixengine2/.packlist
 cd ..
+# symlink without buildroot
+ln -snf %{_docdir}/on2/flixengine/html/perlcgi.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl/README-cgi.html
+ln -snf %{_docdir}/on2/flixengine/html/perlcli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl/README-cli.html
 
 %if %{with python}
 cd flixpython
@@ -307,6 +316,9 @@ cd flixpython
 	--root=$RPM_BUILD_ROOT
 %py_postclean
 cd ..
+# symlink without buildroot
+ln -snf %{_docdir}/on2/flixengine/html/pythoncgi.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/python/README-cgi.html
+ln -snf %{_docdir}/on2/flixengine/html/pythoncli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/python/README-cli.html
 %endif
 
 rm -f $RPM_BUILD_ROOT%{_docdir}/on2/flixengine/javadoc
@@ -319,6 +331,7 @@ rm -f $RPM_BUILD_ROOT%{_docdir}/on2/flixengine/javadoc
 
 # symlink without buildroot
 ln -snf %{_prefix}/src/flixmodules/flixjava/doc $RPM_BUILD_ROOT%{_docdir}/on2/flixengine/javadoc
+ln -snf %{_docdir}/on2/flixengine/html/javacli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/java/README-cli.html
 %endif
 
 %ifarch %{x8664}
