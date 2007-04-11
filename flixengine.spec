@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.8.1
-Release:	0.1
+Release:	0.2
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -52,6 +52,11 @@ Provides:	group(flixd)
 Provides:	user(flixd)
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+# should not provide such deps
+%define		_noautoprov libavcodec.so.51 libavutil.so.49
+# need to provide it for flixd, but we don't want package name dep here
+%define		_noautoreqdep libavformat.so.50
 
 %description
 The On2 Flix Engine provides many of the Flash 8 video encoding
@@ -217,6 +222,9 @@ s,INSTALLEDJAVAFILES="n",INSTALLEDJAVAFILES="y",
 
 ' install.sh
 
+# remove backups from patching as we use globs to package files to buildroot
+find flixsamples '(' -name '*~' -o -name '*.orig' ')' | xargs -r rm -v
+
 %build
 cd .flix-engine-installation-files
 PWD=$(pwd)
@@ -338,7 +346,14 @@ ln -snf %{_docdir}/on2/flixengine/html/javacli.html $RPM_BUILD_ROOT%{_examplesdi
 
 %ifarch %{x8664}
 cp -a testing/lib64/libflixengine2.so* $RPM_BUILD_ROOT%{_libdir}
+# flixd linked statically and other libs are 64 bit
+rm -f $RPM_BUILD_ROOT%{_prefix}/lib/libflixengine2*.so*
 %endif
+
+# we have already newer soname for libavformat.so
+# might need to copy other ffmpeg libs too, but their major is same so should
+# be compatible: libavcodec.so.51.21.0 libavutil.so.49.0.1
+install supportlibs/libavformat.so.50.6.0 $RPM_BUILD_ROOT%{_prefix}/lib
 
 # avoid collision from mplayer package
 mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
@@ -417,19 +432,22 @@ fi
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_prefix}/lib/libflixengine2.so.*.*
-%attr(755,root,root) %{_prefix}/lib/libflixengine2_core.so.*.*
 %ifarch %{x8664}
 %attr(755,root,root) %{_libdir}/libflixengine2.so.*.*
+%else
+%attr(755,root,root) %{_libdir}/libflixengine2.so.*.*
+%attr(755,root,root) %{_libdir}/libflixengine2_core.so.*.*
 %endif
+%attr(755,root,root) %{_prefix}/lib/libavformat.so.*.*.*
 %dir %{_examplesdir}/%{name}-%{version}
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_prefix}/lib/libflixengine2.so
-%attr(755,root,root) %{_prefix}/lib/libflixengine2_core.so
 %ifarch %{x8664}
 %attr(755,root,root) %{_libdir}/libflixengine2.so
+%else
+%attr(755,root,root) %{_libdir}/libflixengine2.so
+%attr(755,root,root) %{_libdir}/libflixengine2_core.so
 %endif
 %{_includedir}/flixengine2
 %{_examplesdir}/%{name}-%{version}/c
