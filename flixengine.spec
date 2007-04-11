@@ -14,14 +14,15 @@
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.8.0
+Version:	8.0.8.1
 Release:	0.1
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
 # check for newer versions at http://flix.on2.com/download
+# Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
 Source0:	%{name}linuxdemo-%{version}.tar.gz
-# NoSource0-md5:	c99b1034b9797bc97d151b1e33ac6df7
+# NoSource0-md5:	8e7780a976b26702b8a2fbb26eb55594
 NoSource:	0
 Source1:	%{name}.init
 Patch0:		%{name}-libdir.patch
@@ -218,15 +219,16 @@ s,INSTALLEDJAVAFILES="n",INSTALLEDJAVAFILES="y",
 
 %build
 cd .flix-engine-installation-files
+PWD=$(pwd)
 
 ln -snf flixhdrs flixengine2
-export C_INCLUDE_PATH=$(pwd)
+export C_INCLUDE_PATH=$PWD
 
 %ifarch %{x8664}
-export LD_LIBRARY_PATH=$(pwd)/testing/lib64
+export LD_LIBRARY_PATH=$PWD/testing/lib64
 ldconfig -n testing/lib64
 %else
-export LD_LIBRARY_PATH=$(pwd)/flixlibs
+export LD_LIBRARY_PATH=$PWD/flixlibs
 ldconfig -n flixlibs
 %endif
 export LIBRARY_PATH=$LD_LIBRARY_PATH
