@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.8.2
-Release:	0.2
+Release:	0.3
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -57,6 +57,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_noautoprov libavcodec.so.51 libavutil.so.49
 # need to provide it for flixd, but we don't want package name dep here
 %define		_noautoreqdep libavformat.so.50
+
+%define		_sysconfdir		/etc/on2
 
 %description
 The On2 Flix Engine provides many of the Flash 8 video encoding
@@ -164,16 +166,17 @@ Python bindings for On2 Flix Engine.
 %description -n python-flixengine -l pl.UTF-8
 Wiązania Pythona dla silnika On2 Flix.
 
-%package docs
-Summary:	HTML Documentation for On2 Flix Engine
-Summary(pl.UTF-8):	Dokumentacja HTML dla silnika On2 Flix
+%package apidocs
+Summary:	HTML API Documentation for On2 Flix Engine
+Summary(pl.UTF-8):	Dokumentacja HTML API dla silnika On2 Flix
 Group:		Documentation
+Obsoletes:	flixengine-docs
 
-%description docs
-HTML Documentation for On2 Flix Engine.
+%description apidocs
+HTML API Documentation for On2 Flix Engine.
 
-%description docs -l pl.UTF-8
-Dokumentacja HTML dla silnika On2 Flix.
+%description apidocs -l pl.UTF-8
+Dokumentacja HTML API dla silnika On2 Flix.
 
 %prep
 %setup -q -n flix-engine-installer-linux-%{version}_DEMO
@@ -278,7 +281,7 @@ rm -rf $RPM_BUILD_ROOT
 	--mencoderbin=$RPM_BUILD_ROOT%{_bindir} \
 	--flixsamples=$RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} \
 	--pidfile=$RPM_BUILD_ROOT/var/run/flixd/flixd.pid \
-	--authdir=$RPM_BUILD_ROOT/var/lib/on2 \
+	--authdir=$RPM_BUILD_ROOT%{_sysconfdir} \
 	--just-install \
 	--offline \
 	--yesireadtheon2license \
@@ -360,8 +363,8 @@ install supportlibs/libavformat.so.50.6.0 $RPM_BUILD_ROOT%{_prefix}/lib
 mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
 
 # do not put hardware fingerprint to rpm package
-> $RPM_BUILD_ROOT/var/lib/on2/hostinfo
-touch $RPM_BUILD_ROOT/var/lib/on2/flixengine.lic
+> $RPM_BUILD_ROOT%{_sysconfdir}/hostinfo
+touch $RPM_BUILD_ROOT%{_sysconfdir}/flixengine.lic
 install -d $RPM_BUILD_ROOT/var/run/flixd
 install -d $RPM_BUILD_ROOT/var/log
 touch $RPM_BUILD_ROOT/var/log/flixd.log
@@ -381,7 +384,7 @@ cat > $RPM_BUILD_ROOT%{_sbindir}/flixd-license-get <<'EOF'
 #!/bin/sh
 . %{_sysconfdir}/flixd-license.conf
 
-%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i /var/lib/on2/hostinfo -o /var/lib/on2/on2product.lic -a 'On2FlixEngine/%{version}_DEMO (%(uname -o))'
+%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/on2product.lic -a 'On2FlixEngine/%{version}_DEMO (%(uname -o))'
 EOF
 
 %clean
@@ -398,8 +401,8 @@ if [ ! -f /var/log/flixd.log ]; then
 	chown root:flixd /var/log/flixd.log
 	chmod 660 /var/log/flixd.log
 fi
-if [ ! -s /var/lib/on2/hostinfo ]; then
-	%{_sbindir}/on2_host_info > /var/lib/on2/hostinfo
+if [ ! -s %{_sysconfdir}/hostinfo ]; then
+	%{_sbindir}/on2_host_info > %{_sysconfdir}/hostinfo
 %banner -e %{name} <<EOF
 To register your copy of flixd fill %{_sysconfdir}/flixd-license.conf
 and afterwards call: %{_sbindir}/flixd-license-get
@@ -434,7 +437,10 @@ fi
 %defattr(644,root,root,755)
 %doc doc/*
 %{?with_java:%exclude %{_docdir}/on2/flixengine/javadoc}
+%dir %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixd-license.conf
+%attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/hostinfo
+%attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixengine.lic
 %attr(755,root,root) %{_sbindir}/flixd
 %attr(755,root,root) %{_sbindir}/flixd-license-get
 %attr(755,root,root) %{_sbindir}/lget
@@ -442,11 +448,8 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/flixd
 
 %{_mandir}/man8/flixd.8*
-%dir /var/lib/on2
 %dir %attr(771,root,flixd) /var/run/flixd
 %ghost %attr(660,root,flixd) /var/log/flixd.log
-%attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) /var/lib/on2/hostinfo
-%attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) /var/lib/on2/flixengine.lic
 %attr(755,root,root) %{_bindir}/mencoder-flixengine
 
 %files libs
@@ -506,6 +509,6 @@ fi
 %{_examplesdir}/%{name}-%{version}/python
 %endif
 
-%files docs
+%files apidocs
 %defattr(644,root,root,755)
-%doc %{_docdir}/on2
+%{_docdir}/on2
