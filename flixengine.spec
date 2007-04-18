@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.8.2
-Release:	0.3
+Release:	0.4
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -384,7 +384,7 @@ cat > $RPM_BUILD_ROOT%{_sbindir}/flixd-license-get <<'EOF'
 #!/bin/sh
 . %{_sysconfdir}/flixd-license.conf
 
-%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/on2product.lic -a 'On2FlixEngine/%{version}_DEMO (%(uname -o))'
+%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/flixengine.lic -a 'On2FlixEngine/%{version}_DEMO (%(uname -o))'
 EOF
 
 %clean
