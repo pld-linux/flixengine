@@ -14,7 +14,7 @@
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.8.1
+Version:	8.0.8.2
 Release:	0.2
 License:	not distributable
 Group:		Applications
@@ -22,7 +22,7 @@ Group:		Applications
 # check for newer versions at http://flix.on2.com/download
 # Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
 Source0:	%{name}linuxdemo-%{version}.tar.gz
-# NoSource0-md5:	8e7780a976b26702b8a2fbb26eb55594
+# NoSource0-md5:	4784ed913f6193766930248bb4dbea3d
 NoSource:	0
 Source1:	%{name}.init
 Patch0:		%{name}-libdir.patch
@@ -76,20 +76,21 @@ fully compliant with FLV format metadata and Adobe Flash Player
 standards.
 
 %description -l pl.UTF-8
-Silnik On2 Flix Engine udostępnia wiele spośród możliwości kodowania
-filmów Flash 8 wiodącego kodera On2 Flix Pro w postaci potężnego SDK.
+Silnik On2 Flix Engine udostępnia wiele spośród możliwości
+kodowania filmów Flash 8 wiodącego kodera On2 Flix Pro w postaci
+potężnego SDK.
 
-Silnik pozwala wykorzystywać możliwości i wydajność filmów Flash z
-kodowaniem On2 VP6 w intranecie, na stronie WWW i w innych
+Silnik pozwala wykorzystywać możliwości i wydajność filmów Flash
+z kodowaniem On2 VP6 w intranecie, na stronie WWW i w innych
 zastosowaniach serwerowych, z zachowaniem kanału alpha na wyjściu
 obrazu i innymi opcjami.
 
-Główną cechą silnika On2 Flix Engine 8 jest obsługa filmów Adobe Flash
-8 z kodekiem On2 VP6 oraz wyjściem obrazu FLV, które można odtwarzać
-bezpośrednio w odtwarzaczu Flash, przekazywać strumieniem poprzez
-Adobe Flash Media Server lub importować do Flash Studio. Nowe wyjście
-FLV jest także w pełni zgodne z formatem metadanych FLV i standardami
-Adobe Flash Playera.
+Główną cechą silnika On2 Flix Engine 8 jest obsługa filmów Adobe
+Flash 8 z kodekiem On2 VP6 oraz wyjściem obrazu FLV, które można
+odtwarzać bezpośrednio w odtwarzaczu Flash, przekazywać strumieniem
+poprzez Adobe Flash Media Server lub importować do Flash Studio. Nowe
+wyjście FLV jest także w pełni zgodne z formatem metadanych FLV i
+standardami Adobe Flash Playera.
 
 %package libs
 Summary:	Shared libraries for On2 Flix Engine
@@ -368,6 +369,21 @@ touch $RPM_BUILD_ROOT/var/log/flixd.log
 # use poldek -e
 rm -f $RPM_BUILD_ROOT%{_sbindir}/flix-engine-uninstall.sh
 
+# make it somewhat easier to acquire license registration
+install -d $RPM_BUILD_ROOT%{_sysconfdir}
+cat > $RPM_BUILD_ROOT%{_sysconfdir}/flixd-license.conf <<'EOF'
+FLIX_USERNAME='<username>'
+FLIX_SERIAL='<serial>'
+EOF
+
+install -d $RPM_BUILD_ROOT%{_sbindir}
+cat > $RPM_BUILD_ROOT%{_sbindir}/flixd-license-get <<'EOF'
+#!/bin/sh
+. %{_sysconfdir}/flixd-license.conf
+
+%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i /var/lib/on2/hostinfo -o /var/lib/on2/on2product.lic -a 'On2FlixEngine/%{version}_DEMO (%(uname -o))'
+EOF
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -385,8 +401,8 @@ fi
 if [ ! -s /var/lib/on2/hostinfo ]; then
 	%{_sbindir}/on2_host_info > /var/lib/on2/hostinfo
 %banner -e %{name} <<EOF
-To register your copy of flixd invoke:
-# %{_sbindir}/lget -u '<username>' -s '<serial>' -i /var/lib/on2/hostinfo -o /var/lib/on2/on2product.lic -a 'On2FlixEngine/%{version}_DEMO (%(uname -o))'
+To register your copy of flixd fill %{_sysconfdir}/flixd-license.conf
+and afterwards call: %{_sbindir}/flixd-license-get
 EOF
 fi
 %service flixd restart
@@ -418,10 +434,13 @@ fi
 %defattr(644,root,root,755)
 %doc doc/*
 %{?with_java:%exclude %{_docdir}/on2/flixengine/javadoc}
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixd-license.conf
 %attr(755,root,root) %{_sbindir}/flixd
+%attr(755,root,root) %{_sbindir}/flixd-license-get
 %attr(755,root,root) %{_sbindir}/lget
 %attr(755,root,root) %{_sbindir}/on2_host_info
 %attr(754,root,root) /etc/rc.d/init.d/flixd
+
 %{_mandir}/man8/flixd.8*
 %dir /var/lib/on2
 %dir %attr(771,root,flixd) /var/run/flixd
