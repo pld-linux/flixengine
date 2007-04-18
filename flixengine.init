@@ -17,7 +17,7 @@
 ## flixd will be unable to decode source files.
 export FLIXD_MENCODER=/usr/bin/mencoder-flixengine
 
-AUTHDIR=/var/lib/on2
+AUTHDIR=/etc/on2
 PORT=2372
 USERID=flixd
 INTERFACE=lo
