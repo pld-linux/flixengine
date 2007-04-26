@@ -22,19 +22,13 @@ PORT=2372
 USERID=flixd
 INTERFACE=lo
 
-check_portmap() {
-	if [ ! -f /var/lock/subsys/portmap ]; then
-		echo >&2 "ERROR: portmap does not appear to be running."
-		echo >&2 "Flix Engine requires the portmap service to run."
-		exit 1
-	fi
-	# test for running portmapper
-}
+if [ "$1" != "stop" ]; then
+	check_portmapper || { nls "Error: portmap isn't running" && exit 0; }
+fi
 
 start(){
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/flixd ]; then
-		check_portmap
 		msg_starting "Flix Engine"
 		daemon --user $USERID /usr/sbin/flixd --authdir=$AUTHDIR \
 			--interface=$INTERFACE --port=$PORT --reuseaddr \
