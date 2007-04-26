@@ -47,7 +47,7 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	portmap
-Requires:	rc-scripts
+Requires:	rc-scripts >= 0.4.1.5
 Provides:	group(flixd)
 Provides:	user(flixd)
 ExclusiveArch:	%{ix86} %{x8664}
