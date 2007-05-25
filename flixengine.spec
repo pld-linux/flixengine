@@ -15,7 +15,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.8.2
-Release:	0.4
+Release:	0.5
 License:	not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -441,6 +441,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixd-license.conf
 %attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/hostinfo
 %attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixengine.lic
+%attr(755,root,root) %{_prefix}/lib/libavformat.so.*.*.*
 %attr(755,root,root) %{_sbindir}/flixd
 %attr(755,root,root) %{_sbindir}/flixd-license-get
 %attr(755,root,root) %{_sbindir}/lget
@@ -460,7 +461,6 @@ fi
 %attr(755,root,root) %{_libdir}/libflixengine2.so.*.*
 %attr(755,root,root) %{_libdir}/libflixengine2_core.so.*.*
 %endif
-%attr(755,root,root) %{_prefix}/lib/libavformat.so.*.*.*
 %dir %{_examplesdir}/%{name}-%{version}
 
 %files devel
