@@ -15,8 +15,8 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.8.2
-Release:	0.5
-License:	not distributable
+Release:	0.6
+License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
 # check for newer versions at http://flix.on2.com/download
@@ -39,6 +39,7 @@ BuildRequires:	rpmbuild(macros) >= 1.344
 BuildRequires:	ffmpeg-libs
 BuildRequires:	lame-libs
 %endif
+Requires(post,postun):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
@@ -395,6 +396,7 @@ rm -rf $RPM_BUILD_ROOT
 %useradd -u 179 -g flixd -c "On2 Flixd" flixd
 
 %post
+/sbin/ldconfig
 /sbin/chkconfig --add flixd
 if [ ! -f /var/log/flixd.log ]; then
 	touch /var/log/flixd.log
@@ -417,6 +419,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
+/sbin/ldconfig
 if [ "$1" = "0" ]; then
 	%userremove flixd
 	%groupremove flixd
