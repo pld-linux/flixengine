@@ -11,6 +11,8 @@
 %undefine	with_java
 %endif
 #
+%define		full_version	%{version}%{?with_demo:_DEMO}
+#
 %include	/usr/lib/rpm/macros.perl
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
@@ -188,9 +190,9 @@ HTML API Documentation for On2 Flix Engine.
 Dokumentacja HTML API dla silnika On2 Flix.
 
 %prep
-%setup -q -T -b %{?with_demo:0}%{!?with_demo:1 -n flix-engine-installer-linux-%{version}}
-bin=flix-engine-installer-linux-%{version}%{?with_demo:_DEMO}.bin
-tar=flix-engine-linux-%{version}%{?with_demo:_DEMO}.tar.gz
+%setup -q -T -b %{?with_demo:0}%{!?with_demo:1} -n flix-engine-installer-linux-%{full_version}
+bin=flix-engine-installer-linux-%{full_version}.bin
+tar=flix-engine-linux-%{full_version}.tar.gz
 
 OFFSET=$( awk -F= '/OFFSET=/{print $2; exit}' $bin)
 dd bs=8 if=$bin of=$tar skip=$OFFSET
@@ -202,10 +204,10 @@ dd bs=8 if=$bin of=$tar skip=$OFFSET
 %{__sed} -ne '/## FUNCTIONS common/,/## END - common function/p' $bin > functions.sh
 cat <<'EOF' > install.sh
 #!/bin/bash
-export VERSION=%{version}%{?with_demo:_DEMO}
+export VERSION=%{full_version}
 %{?with_demo:export FLIXENGINEDEMO=1}
 export nullout=/dev/null
-export tempdir=%{_builddir}/flix-engine-installer-linux-%{version}%{?with_demo:_DEMO}
+export tempdir=%{_builddir}/flix-engine-installer-linux-%{full_version}
 
 . $(dirname "$0")/functions.sh
 cd .flix-engine-installation-files
@@ -393,7 +395,7 @@ cat > $RPM_BUILD_ROOT%{_sbindir}/flixd-license-get <<'EOF'
 #!/bin/sh
 . %{_sysconfdir}/flixd-license.conf
 
-%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/flixengine.lic -a 'On2FlixEngine/%{version}%{?with_demo:_DEMO} (%(uname -o))'
+%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/flixengine.lic -a 'On2FlixEngine/%{full_version} (%(uname -o))'
 EOF
 
 %clean
