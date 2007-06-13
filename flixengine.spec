@@ -4,6 +4,7 @@
 %bcond_without	python		# do not build Python bindings
 %bcond_without	java		# do not build Java bindings
 %bcond_with	tests		# perform "make test". needs running flixd on localhost
+%bcond_without	demo	# use production tarball (you need one too:))
 #
 %ifarch %{x8664}
 %undefine	with_python
@@ -15,16 +16,23 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.8.2
-Release:	0.6
+Release:	0.7
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
 # check for newer versions at http://flix.on2.com/download
 # Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
+%if %{with demo}
 Source0:	%{name}linuxdemo-%{version}.tar.gz
 # NoSource0-md5:	4784ed913f6193766930248bb4dbea3d
 NoSource:	0
-Source1:	%{name}.init
+%endif
+%if %{without demo}
+Source1:	flix-engine-installer-linux-%{version}.tar.gz
+# NoSource0-md5:	4784ed913f6193766930248bb4dbea3d
+NoSource:	1
+%endif
+Source2:	%{name}.init
 Patch0:		%{name}-libdir.patch
 Patch1:		%{name}-phploader.patch
 URL:		http://www.on2.com/developer/flix-engine-sdk
@@ -180,9 +188,9 @@ HTML API Documentation for On2 Flix Engine.
 Dokumentacja HTML API dla silnika On2 Flix.
 
 %prep
-%setup -q -n flix-engine-installer-linux-%{version}_DEMO
-bin=flix-engine-installer-linux-%{version}_DEMO.bin
-tar=flix-engine-linux-%{version}_DEMO.tar.gz
+%setup -q -T -b %{?with_demo:0}%{!?with_demo:1 -n flix-engine-installer-linux-%{version}}
+bin=flix-engine-installer-linux-%{version}%{?with_demo:_DEMO}.bin
+tar=flix-engine-linux-%{version}%{?with_demo:_DEMO}.tar.gz
 
 OFFSET=$( awk -F= '/OFFSET=/{print $2; exit}' $bin)
 dd bs=8 if=$bin of=$tar skip=$OFFSET
@@ -194,10 +202,10 @@ dd bs=8 if=$bin of=$tar skip=$OFFSET
 %{__sed} -ne '/## FUNCTIONS common/,/## END - common function/p' $bin > functions.sh
 cat <<'EOF' > install.sh
 #!/bin/bash
-export VERSION=%{version}_DEMO
-export FLIXENGINEDEMO=1
+export VERSION=%{version}%{?with_demo:_DEMO}
+%{?with_demo:export FLIXENGINEDEMO=1}
 export nullout=/dev/null
-export tempdir=%{_builddir}/flix-engine-installer-linux-%{version}_DEMO
+export tempdir=%{_builddir}/flix-engine-installer-linux-%{version}%{?with_demo:_DEMO}
 
 . $(dirname "$0")/functions.sh
 cd .flix-engine-installation-files
@@ -291,7 +299,7 @@ rm -rf $RPM_BUILD_ROOT
 	--no-init \
 	--noprereqlibs
 
-install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixd
+install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixd
 
 cd .flix-engine-installation-files
 
@@ -385,7 +393,7 @@ cat > $RPM_BUILD_ROOT%{_sbindir}/flixd-license-get <<'EOF'
 #!/bin/sh
 . %{_sysconfdir}/flixd-license.conf
 
-%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/flixengine.lic -a 'On2FlixEngine/%{version}_DEMO (%(uname -o))'
+%{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/flixengine.lic -a 'On2FlixEngine/%{version}%{?with_demo:_DEMO} (%(uname -o))'
 EOF
 
 %clean
