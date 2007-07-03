@@ -522,7 +522,9 @@ fi
 %files -n java-flixengine
 %defattr(644,root,root,755)
 %doc %{_docdir}/on2/flixengine/javadoc
-# perhaps it should be /usr/lib/jvm/java-sun-1.6.0/jre/lib/i386/libflixengine2_jni.so ?
+# perhaps these should be:
+# /usr/%{_lib}/jvm/java-sun-1.6.0/jre/lib/%{arch}/libflixengine2_jni.so
+# /usr/%{_lib}/jvm/java-sun-1.6.0/jre/lib/ext/flixengine2.jar
 %attr(755,root,root) %{_libdir}/libflixengine2_jni.so
 %{_javadir}/flixengine2.jar
 %{_examplesdir}/%{name}-%{version}/java
