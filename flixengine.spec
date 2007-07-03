@@ -18,7 +18,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.8.2
-Release:	1
+Release:	2
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -65,9 +65,9 @@ ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # should not provide such deps
-%define		_noautoprov libavcodec.so.51 libavutil.so.49
+%define		_noautoprov libavutil.so.49 libavformat.so.50 libavcodec.so.51
 # need to provide it for flixd, but we don't want package name dep here
-%define		_noautoreqdep libavformat.so.50
+%define		_noautoreq %{_noautoprov}
 
 %define		_sysconfdir		/etc/on2
 
@@ -365,10 +365,11 @@ cp -a testing/lib64/libflixengine2.so* $RPM_BUILD_ROOT%{_libdir}
 rm -f $RPM_BUILD_ROOT%{_prefix}/lib/libflixengine2*.so*
 %endif
 
-# we have already newer soname for libavformat.so
-# might need to copy other ffmpeg libs too, but their major is same so should
-# be compatible: libavcodec.so.51.21.0 libavutil.so.49.0.1
+# we have already newer soname for libavformat.so in ffmpeg-libs
+# copy from bundled ones.
 install supportlibs/libavformat.so.50.6.0 $RPM_BUILD_ROOT%{_prefix}/lib
+install supportlibs/libavcodec.so.51.21.0 $RPM_BUILD_ROOT%{_prefix}/lib
+install supportlibs/libavutil.so.49.0.1 $RPM_BUILD_ROOT%{_prefix}/lib
 
 # avoid collision from mplayer package
 mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
@@ -455,6 +456,8 @@ fi
 %attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/hostinfo
 %attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixengine.lic
 %attr(755,root,root) %{_prefix}/lib/libavformat.so.*.*.*
+%attr(755,root,root) %{_prefix}/lib/libavcodec.so.*.*.*
+%attr(755,root,root) %{_prefix}/lib/libavutil.so.*.*.*
 %attr(755,root,root) %{_sbindir}/flixd
 %attr(755,root,root) %{_sbindir}/flixd-license-get
 %attr(755,root,root) %{_sbindir}/lget
