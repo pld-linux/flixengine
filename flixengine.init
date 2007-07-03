@@ -17,6 +17,12 @@
 ## flixd will be unable to decode source files.
 export FLIXD_MENCODER=/usr/bin/mencoder-flixengine
 
+## Avoid potential seg fault due to unchecked allocations within libogg.
+## This will force a read error should any encode instance's ogg demuxer
+## use more than 70% of available physical memory
+## See flixd(8) for further details.
+export FLIX_OGG_PHYMEM_PCTMAX=70
+
 AUTHDIR=/etc/on2
 PORT=2372
 USERID=flixd
