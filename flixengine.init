@@ -27,7 +27,7 @@ if [ "$1" != "stop" ]; then
 fi
 
 # Get service config - may override defaults
-[ -f /etc/sysconfig/flixengine ] && . /etc/sysconfig/flixengine
+[ -f /etc/sysconfig/flixd ] && . /etc/sysconfig/flixd
 
 start() {
 	# Check if the service is already running?
