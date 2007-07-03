@@ -18,7 +18,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.9.0
-Release:	1
+Release:	1.2
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -36,6 +36,7 @@ Source1:	flix-engine-installer-linux-%{version}.tar.gz
 NoSource:	1
 %endif
 Source2:	%{name}.init
+Source3:	flixengine.sysconfig
 Patch0:		%{name}-libdir.patch
 Patch1:		%{name}-phploader.patch
 URL:		http://www.on2.com/developer/flix-engine-sdk
@@ -214,7 +215,28 @@ export tempdir=%{_builddir}/flix-engine-installer-linux-%{full_version}
 cd .flix-engine-installation-files
 
 export -f getinput inset ynanswer
-./install.sh "$@"
+instlog=install.log
+./install.sh "$@" | tee -i $instlog
+if [ -f "$instlog" ]; then
+	echo "Local system info:" >>$instlog
+	uname -a 2>/dev/null >>$instlog
+	head /etc/*version* 2>/dev/null >>$instlog
+	head /etc/*release* 2>/dev/null >>$instlog
+	cat /proc/cpuinfo 2>/dev/null >>$instlog
+	/lib/ld-linux.so.2 /lib/libc.so.6 2>/dev/null >>$instlog
+	echo "---" 2>/dev/null >>$instlog
+	/lib/ld-linux.so.2 /lib32/libc.so.6 2>/dev/null >>$instlog
+	echo "---" 2>/dev/null >>$instlog
+	/lib/libc.so.6 2>/dev/null >>$instlog
+	echo "---" 2>/dev/null >>$instlog
+	file /lib/libc.so.6 2>/dev/null >>$instlog
+	echo "---" 2>/dev/null >>$instlog
+	/sbin/ifconfig -a 2>/dev/null >>$instlog
+
+	echo "A log of this installation can be found here:"
+	echo "  $instlog"
+	echo
+fi
 EOF
 chmod +x install.sh
 
@@ -286,6 +308,7 @@ cd ..
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,sysconfig}
 
 ./install.sh \
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
@@ -302,7 +325,9 @@ rm -rf $RPM_BUILD_ROOT
 	--no-init \
 	--noprereqlibs
 
-install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixd
+rm -f $RPM_BUILD_ROOT/etc/rc.d/init.d/flixengine
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixd
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/flixd
 
 cd .flix-engine-installation-files
 install lget on2_host_info $RPM_BUILD_ROOT%{_sbindir}
@@ -465,6 +490,7 @@ fi
 %attr(755,root,root) %{_sbindir}/lget
 %attr(755,root,root) %{_sbindir}/on2_host_info
 %attr(754,root,root) /etc/rc.d/init.d/flixd
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/flixd
 
 %{_mandir}/man8/flixd.8*
 %dir %attr(771,root,flixd) /var/run/flixd
@@ -496,6 +522,7 @@ fi
 %files -n java-flixengine
 %defattr(644,root,root,755)
 %doc %{_docdir}/on2/flixengine/javadoc
+# perhaps it should be /usr/lib/jvm/java-sun-1.6.0/jre/lib/i386/libflixengine2_jni.so ?
 %attr(755,root,root) %{_libdir}/libflixengine2_jni.so
 %{_javadir}/flixengine2.jar
 %{_examplesdir}/%{name}-%{version}/java
