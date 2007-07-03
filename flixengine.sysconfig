@@ -1,0 +1,8 @@
+# Customized settings for flixengine
+
+# Nice level for flixengine
+#SERVICE_RUN_NICE_LEVEL="+2"
+
+#PORT=2372
+
+#INTERFACE=lo

@@ -26,7 +26,10 @@ if [ "$1" != "stop" ]; then
 	check_portmapper || { nls "Error: portmap isn't running" && exit 0; }
 fi
 
-start(){
+# Get service config - may override defaults
+[ -f /etc/sysconfig/flixengine ] && . /etc/sysconfig/flixengine
+
+start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/flixd ]; then
 		msg_starting "Flix Engine"
