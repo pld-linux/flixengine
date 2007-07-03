@@ -11,14 +11,15 @@
 %undefine	with_java
 %endif
 #
-%define		full_version	%{version}%{?with_demo:_DEMO}
+%define		full_version	%{version}%{?with_demo:_DEMO}%{?_extra}
+%define		_extra	-2
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.9.0
-Release:	1.2
+Release:	2
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -31,8 +32,8 @@ NoSource:	0
 %endif
 %if %{without demo}
 # Source1Download:	http://flix.on2.com/flix/download/flix-engine-installer-linux-%{version}.tar.gz
-Source1:	flix-engine-installer-linux-%{version}.tar.gz
-# NoSource1-md5:	918847c38ddf6eed5be2c6e8852d7d33
+Source1:	flix-engine-installer-linux-%{version}%{?_extra}.tar.gz
+# NoSource1-md5:	22fe914f3ce452375c200c91cc3dccee
 NoSource:	1
 %endif
 Source2:	%{name}.init
