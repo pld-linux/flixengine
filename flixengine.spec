@@ -17,21 +17,22 @@
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.8.2
-Release:	2
+Version:	8.0.9.0
+Release:	1
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
-# check for newer versions at http://flix.on2.com/download
+# check for newer versions at http://flix.on2.com/flix/download/
 # Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
 %if %{with demo}
 Source0:	%{name}linuxdemo-%{version}.tar.gz
-# NoSource0-md5:	4784ed913f6193766930248bb4dbea3d
+# NoSource0-md5:	70d4675f5792ab617ed7dc19cc14a650
 NoSource:	0
 %endif
 %if %{without demo}
+# Source1Download:	http://flix.on2.com/flix/download/flix-engine-installer-linux-%{version}.tar.gz
 Source1:	flix-engine-installer-linux-%{version}.tar.gz
-# NoSource0-md5:	4784ed913f6193766930248bb4dbea3d
+# NoSource1-md5:	918847c38ddf6eed5be2c6e8852d7d33
 NoSource:	1
 %endif
 Source2:	%{name}.init
@@ -304,6 +305,7 @@ rm -rf $RPM_BUILD_ROOT
 install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixd
 
 cd .flix-engine-installation-files
+install lget on2_host_info $RPM_BUILD_ROOT%{_sbindir}
 
 # symlink without buildroot
 ln -snf %{_docdir}/on2/flixengine/html/c/cli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/c/README-cli.html
