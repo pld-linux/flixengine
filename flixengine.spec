@@ -12,14 +12,14 @@
 %endif
 #
 %define		full_version	%{version}%{?with_demo:_DEMO}%{?_extra}
-%define		_extra	-2
+%define		_extra	%{nil}
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.9.0
-Release:	2
+Version:	8.0.9.1
+Release:	0.1
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -27,7 +27,7 @@ Group:		Applications
 # Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
 %if %{with demo}
 Source0:	%{name}linuxdemo-%{version}.tar.gz
-# NoSource0-md5:	70d4675f5792ab617ed7dc19cc14a650
+# NoSource0-md5:	30046ffbf51a1288afde194d5298c76c
 NoSource:	0
 %endif
 %if %{without demo}
@@ -330,6 +330,10 @@ rm -f $RPM_BUILD_ROOT/etc/rc.d/init.d/flixengine
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/flixd
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/flixd
 
+# mencoder-flixengine searches for codecs from /usr/lib/win32 and there's no
+# way to override it by commandline arg or env var.
+ln -s codecs $RPM_BUILD_ROOT%{_prefix}/lib/win32
+
 cd .flix-engine-installation-files
 install lget on2_host_info $RPM_BUILD_ROOT%{_sbindir}
 
@@ -492,6 +496,7 @@ fi
 %attr(755,root,root) %{_sbindir}/on2_host_info
 %attr(754,root,root) /etc/rc.d/init.d/flixd
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/flixd
+%{_prefix}/lib/win32
 
 %{_mandir}/man8/flixd.8*
 %dir %attr(771,root,flixd) /var/run/flixd
