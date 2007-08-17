@@ -33,7 +33,7 @@ NoSource:	0
 %if %{without demo}
 # Source1Download:	http://flix.on2.com/flix/download/flix-engine-installer-linux-%{version}.tar.gz
 Source1:	flix-engine-installer-linux-%{version}%{?_extra}.tar.gz
-# NoSource1-md5:	22fe914f3ce452375c200c91cc3dccee
+# NoSource1-md5:	ecf91acf067775e27059977b7a5a8da7
 NoSource:	1
 %endif
 Source2:	%{name}.init
