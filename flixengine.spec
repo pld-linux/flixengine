@@ -350,7 +350,7 @@ ln -snf %{_docdir}/on2/flixengine/html/c/cli.html $RPM_BUILD_ROOT%{_examplesdir}
 install -d $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d
 cat <<'EOF' > $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d/flixengine.ini
 ; Enable flixengine extension module
-extension=flixengine2.so
+;extension=flixengine2.so
 EOF
 # symlink without buildroot
 ln -snf %{_docdir}/on2/flixengine/html/phpcgi.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-cgi.html
