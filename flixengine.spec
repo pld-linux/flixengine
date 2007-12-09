@@ -37,7 +37,7 @@ Source1:	flix-engine-installer-linux-%{version}%{?_extra}.tar.gz
 NoSource:	1
 %endif
 Source2:	%{name}.init
-Source3:	flixengine.sysconfig
+Source3:	%{name}.sysconfig
 Patch0:		%{name}-libdir.patch
 Patch1:		%{name}-phploader.patch
 URL:		http://www.on2.com/developer/flix-engine-sdk
@@ -135,6 +135,7 @@ Summary:	Java bindings for On2 Flix Engine
 Summary(pl.UTF-8):	Wiązania Javy dla silnika On2 Flix
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	jpackage-utils
 
 %description -n java-flixengine
 Java bindings for On2 Flix Engine.
