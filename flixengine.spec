@@ -40,7 +40,7 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Patch0:		%{name}-libdir.patch
 Patch1:		%{name}-phploader.patch
-URL:		http://www.on2.com/developer/flix-engine-sdk
+URL:		http://www.on2.com/index.php?474
 BuildRequires:	bash
 %{?with_java:BuildRequires:	jre}
 BuildRequires:	perl-base
