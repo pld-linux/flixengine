@@ -18,7 +18,7 @@
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.10.0
+Version:	8.0.10.1
 Release:	0.1
 License:	(probably) not distributable
 Group:		Applications
@@ -27,7 +27,7 @@ Group:		Applications
 # Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
 %if %{with demo}
 Source0:	%{name}linuxdemo-%{version}.tar.gz
-# NoSource0-md5:	4ee2c94955b4cff4ee41f424ff17ce5f
+# NoSource0-md5:	3d0accb19f6d9dcd6ea2cd139a150d9e
 NoSource:	0
 %endif
 %if %{without demo}
@@ -354,6 +354,7 @@ cat <<'EOF' > $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d/flixengine.ini
 ;extension=flixengine2.so
 EOF
 # symlink without buildroot
+install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php
 ln -snf %{_docdir}/on2/flixengine/html/phpcgi.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-cgi.html
 ln -snf %{_docdir}/on2/flixengine/html/phpcli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-cli.html
 
@@ -364,6 +365,7 @@ cd flixperl
 rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/auto/On2/flixengine2/.packlist
 cd ..
 # symlink without buildroot
+install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl
 ln -snf %{_docdir}/on2/flixengine/html/perlcgi.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl/README-cgi.html
 ln -snf %{_docdir}/on2/flixengine/html/perlcli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl/README-cli.html
 
@@ -400,9 +402,9 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/libflixengine2*.so*
 
 # we have already newer soname for libavformat.so in ffmpeg-libs
 # copy from bundled ones.
-install supportlibs/libavformat.so.50.6.0 $RPM_BUILD_ROOT%{_prefix}/lib
-install supportlibs/libavcodec.so.51.21.0 $RPM_BUILD_ROOT%{_prefix}/lib
-install supportlibs/libavutil.so.49.0.1 $RPM_BUILD_ROOT%{_prefix}/lib
+install supportlibs/libavformat.so.51.12.2 $RPM_BUILD_ROOT%{_prefix}/lib
+install supportlibs/libavcodec.so.51.41.0 $RPM_BUILD_ROOT%{_prefix}/lib
+install supportlibs/libavutil.so.49.5.0 $RPM_BUILD_ROOT%{_prefix}/lib
 
 # avoid collision from mplayer package
 mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
