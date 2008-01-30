@@ -452,8 +452,11 @@ fi
 if [ ! -s %{_sysconfdir}/hostinfo ]; then
 	%{_sbindir}/on2_host_info > %{_sysconfdir}/hostinfo
 %banner -e %{name} <<EOF
-To register your copy of flixd fill %{_sysconfdir}/flixd-license.conf
-and afterwards call: %{_sbindir}/flixd-license-get
+Put your username and serial key to %{_sysconfdir}/flixd-license.conf
+and invoke:
+%{_sbindir}/flixd-license-get
+
+You can register evaluation demo at <http://flix.on2.com/demos/>.
 EOF
 fi
 %service flixd restart
