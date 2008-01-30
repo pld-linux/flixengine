@@ -429,9 +429,19 @@ EOF
 install -d $RPM_BUILD_ROOT%{_sbindir}
 cat > $RPM_BUILD_ROOT%{_sbindir}/flixd-license-get <<'EOF'
 #!/bin/sh
+set -e
+
 . %{_sysconfdir}/flixd-license.conf
+if [ -z "$FLIX_USERNAME" -o -z "$FLIX_SERIAL" ]; then
+	echo >&2 "Please fill FLIX_USERNAME and FLIX_SERIAL!"
+	exit 1
+fi
 
 %{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/flixengine.lic -a 'On2FlixEngine/%{full_version} (%(uname -o))'
+echo ""
+echo "Serial registered and saved into %{_sysconfdir}/flixengine.lic"
+echo ""
+echo "Run \"/sbin/service flixd start\" to start flixd"
 EOF
 
 %clean
