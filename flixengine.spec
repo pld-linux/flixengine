@@ -1,8 +1,8 @@
 #
 # Conditional build:
 %bcond_without	autodeps	# don't BR packages needed only for resolving deps
-%bcond_without	python		# do not build Python bindings
-%bcond_without	java		# do not build Java bindings
+%bcond_with	python		# do not build Python bindings
+%bcond_with	java		# do not build Java bindings
 %bcond_with	tests		# perform "make test". needs running flixd on localhost
 %bcond_without	demo	# use production tarball (you need one too:))
 #
@@ -526,6 +526,8 @@ fi
 %else
 %attr(755,root,root) %{_libdir}/libflixengine2.so.*.*
 %attr(755,root,root) %{_libdir}/libflixengine2_core.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/libflixengine2.so.0
+%attr(755,root,root) %ghost %{_libdir}/libflixengine2_core.so.0
 %endif
 %dir %{_examplesdir}/%{name}-%{version}
 
