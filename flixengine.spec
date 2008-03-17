@@ -52,7 +52,6 @@ BuildRequires:	rpmbuild(macros) >= 1.344
 BuildRequires:	ffmpeg-libs
 BuildRequires:	lame-libs
 %endif
-Requires(post,postun):	/sbin/ldconfig
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
@@ -406,7 +405,7 @@ install -d $RPM_BUILD_ROOT%{_prefix}/lib/flixd
 install supportlibs/libavformat.so.* $RPM_BUILD_ROOT%{_prefix}/lib/flixd
 install supportlibs/libavcodec.so.* $RPM_BUILD_ROOT%{_prefix}/lib/flixd
 install supportlibs/libavutil.so.* $RPM_BUILD_ROOT%{_prefix}/lib/flixd
-ldconfig -N $RPM_BUILD_ROOT%{_prefix}/lib/flixd
+ldconfig -n $RPM_BUILD_ROOT%{_prefix}/lib/flixd
 
 # avoid collision from mplayer package
 mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
@@ -460,7 +459,6 @@ rm -rf $RPM_BUILD_ROOT
 %useradd -u 179 -g flixd -c "On2 Flixd" flixd
 
 %post
-/sbin/ldconfig %{_prefix}/lib/flixd
 /sbin/chkconfig --add flixd
 if [ ! -f /var/log/flixd.log ]; then
 	touch /var/log/flixd.log
@@ -486,7 +484,6 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
-/sbin/ldconfig %{_prefix}/lib/flixd
 if [ "$1" = "0" ]; then
 	%userremove flixd
 	%groupremove flixd
@@ -513,11 +510,11 @@ fi
 %attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixengine.lic
 %dir %{_prefix}/lib/flixd
 %attr(755,root,root) %{_prefix}/lib/flixd/libavcodec.so.*.*.*
-%attr(755,root,root) %ghost %{_prefix}/lib/flixd/libavcodec.so.51
+%attr(755,root,root) %{_prefix}/lib/flixd/libavcodec.so.51
 %attr(755,root,root) %{_prefix}/lib/flixd/libavformat.so.*.*.*
-%attr(755,root,root) %ghost %{_prefix}/lib/flixd/libavformat.so.51
+%attr(755,root,root) %{_prefix}/lib/flixd/libavformat.so.51
 %attr(755,root,root) %{_prefix}/lib/flixd/libavutil.so.*.*.*
-%attr(755,root,root) %ghost %{_prefix}/lib/flixd/libavutil.so.49
+%attr(755,root,root) %{_prefix}/lib/flixd/libavutil.so.49
 %attr(755,root,root) %{_sbindir}/flixd
 %attr(755,root,root) %{_sbindir}/flixd-license-get
 %attr(755,root,root) %{_sbindir}/lget
