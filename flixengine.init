@@ -39,6 +39,7 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/flixd ]; then
 		msg_starting "Flix Engine"
+		export LD_LIBRARY_PATH=/usr/lib/flixd
 		daemon --user $USERID /usr/sbin/flixd --authdir=$AUTHDIR \
 			--interface=$INTERFACE --port=$PORT --reuseaddr \
 			--pidfile /var/run/flixd/flixd.pid --logfile=/var/log/flixd.log
