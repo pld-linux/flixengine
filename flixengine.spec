@@ -441,10 +441,10 @@ fi
 
 %{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/flixengine.lic -a 'On2FlixEngine/%{full_version} (%(uname -o))'
 if [ $? = 0 ]; then
-	echo >&2 ""
 	echo >&2 "Serial registered and saved into %{_sysconfdir}/flixengine.lic"
 	echo >&2 ""
 	echo >&2 "Run \"/sbin/service flixd start\" to start flixd"
+	echo >&2 ""
 else
 	echo >&2 ""
 	echo >&2 "There was error registering your license key."
