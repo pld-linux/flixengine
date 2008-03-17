@@ -19,7 +19,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.10.1
-Release:	0.2
+Release:	0.6
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -401,10 +401,12 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/lib/libflixengine2*.so*
 %endif
 
 # we have already newer soname for libavformat.so in ffmpeg-libs
-# copy from bundled ones.
-install supportlibs/libavformat.so.51.12.2 $RPM_BUILD_ROOT%{_prefix}/lib
-install supportlibs/libavcodec.so.51.41.0 $RPM_BUILD_ROOT%{_prefix}/lib
-install supportlibs/libavutil.so.49.5.0 $RPM_BUILD_ROOT%{_prefix}/lib
+# copy from bundled ones to private directory
+install -d $RPM_BUILD_ROOT%{_prefix}/lib/flixd
+install supportlibs/libavformat.so.* $RPM_BUILD_ROOT%{_prefix}/lib/flixd
+install supportlibs/libavcodec.so.* $RPM_BUILD_ROOT%{_prefix}/lib/flixd
+install supportlibs/libavutil.so.* $RPM_BUILD_ROOT%{_prefix}/lib/flixd
+ldconfig -N $RPM_BUILD_ROOT%{_prefix}/lib/flixd
 
 # avoid collision from mplayer package
 mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
@@ -438,10 +440,16 @@ if [ -z "$FLIX_USERNAME" -o -z "$FLIX_SERIAL" ]; then
 fi
 
 %{_sbindir}/lget -u "$FLIX_USERNAME" -s "$FLIX_SERIAL" -i %{_sysconfdir}/hostinfo -o %{_sysconfdir}/flixengine.lic -a 'On2FlixEngine/%{full_version} (%(uname -o))'
-echo ""
-echo "Serial registered and saved into %{_sysconfdir}/flixengine.lic"
-echo ""
-echo "Run \"/sbin/service flixd start\" to start flixd"
+if [ $? = 0 ]; then
+	echo >&2 ""
+	echo >&2 "Serial registered and saved into %{_sysconfdir}/flixengine.lic"
+	echo >&2 ""
+	echo >&2 "Run \"/sbin/service flixd start\" to start flixd"
+else
+	echo >&2 ""
+	echo >&2 "There was error registering your license key."
+	exit 1
+fi
 EOF
 
 %clean
@@ -452,7 +460,7 @@ rm -rf $RPM_BUILD_ROOT
 %useradd -u 179 -g flixd -c "On2 Flixd" flixd
 
 %post
-/sbin/ldconfig
+/sbin/ldconfig %{_prefix}/lib/flixd
 /sbin/chkconfig --add flixd
 if [ ! -f /var/log/flixd.log ]; then
 	touch /var/log/flixd.log
@@ -478,7 +486,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
-/sbin/ldconfig
+/sbin/ldconfig %{_prefix}/lib/flixd
 if [ "$1" = "0" ]; then
 	%userremove flixd
 	%groupremove flixd
@@ -503,9 +511,13 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixd-license.conf
 %attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/hostinfo
 %attr(640,root,flixd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flixengine.lic
-%attr(755,root,root) %{_prefix}/lib/libavformat.so.*.*.*
-%attr(755,root,root) %{_prefix}/lib/libavcodec.so.*.*.*
-%attr(755,root,root) %{_prefix}/lib/libavutil.so.*.*.*
+%dir %{_prefix}/lib/flixd
+%attr(755,root,root) %{_prefix}/lib/flixd/libavcodec.so.*.*.*
+%attr(755,root,root) %ghost %{_prefix}/lib/flixd/libavcodec.so.51
+%attr(755,root,root) %{_prefix}/lib/flixd/libavformat.so.*.*.*
+%attr(755,root,root) %ghost %{_prefix}/lib/flixd/libavformat.so.51
+%attr(755,root,root) %{_prefix}/lib/flixd/libavutil.so.*.*.*
+%attr(755,root,root) %ghost %{_prefix}/lib/flixd/libavutil.so.49
 %attr(755,root,root) %{_sbindir}/flixd
 %attr(755,root,root) %{_sbindir}/flixd-license-get
 %attr(755,root,root) %{_sbindir}/lget
