@@ -18,8 +18,8 @@
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.10.1
-Release:	0.6
+Version:	8.0.10.2
+Release:	0.1
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -27,7 +27,7 @@ Group:		Applications
 # Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
 %if %{with demo}
 Source0:	%{name}linuxdemo-%{version}.tar.gz
-# NoSource0-md5:	3d0accb19f6d9dcd6ea2cd139a150d9e
+# NoSource0-md5:	52afc704a1cda7698afc672cbd57d343
 NoSource:	0
 %endif
 %if %{without demo}
@@ -532,6 +532,7 @@ fi
 %defattr(644,root,root,755)
 %ifarch %{x8664}
 %attr(755,root,root) %{_libdir}/libflixengine2.so.*.*
+%attr(755,root,root) %ghost %{_libdir}/libflixengine2.so.0
 %else
 %attr(755,root,root) %{_libdir}/libflixengine2.so.*.*
 %attr(755,root,root) %{_libdir}/libflixengine2_core.so.*.*
