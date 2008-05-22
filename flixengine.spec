@@ -18,7 +18,7 @@
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.10.2
+Version:	8.0.11.0
 Release:	0.1
 License:	(probably) not distributable
 Group:		Applications
@@ -27,7 +27,7 @@ Group:		Applications
 # Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
 %if %{with demo}
 Source0:	%{name}linuxdemo-%{version}.tar.gz
-# NoSource0-md5:	52afc704a1cda7698afc672cbd57d343
+# NoSource0-md5:	4b44ca7f3fa46ce2242396c8e94149ce
 NoSource:	0
 %endif
 %if %{without demo}
@@ -91,21 +91,20 @@ fully compliant with FLV format metadata and Adobe Flash Player
 standards.
 
 %description -l pl.UTF-8
-Silnik On2 Flix Engine udostępnia wiele spośród możliwości
-kodowania filmów Flash 8 wiodącego kodera On2 Flix Pro w postaci
-potężnego SDK.
+Silnik On2 Flix Engine udostępnia wiele spośród możliwości kodowania
+filmów Flash 8 wiodącego kodera On2 Flix Pro w postaci potężnego SDK.
 
-Silnik pozwala wykorzystywać możliwości i wydajność filmów Flash
-z kodowaniem On2 VP6 w intranecie, na stronie WWW i w innych
+Silnik pozwala wykorzystywać możliwości i wydajność filmów Flash z
+kodowaniem On2 VP6 w intranecie, na stronie WWW i w innych
 zastosowaniach serwerowych, z zachowaniem kanału alpha na wyjściu
 obrazu i innymi opcjami.
 
-Główną cechą silnika On2 Flix Engine 8 jest obsługa filmów Adobe
-Flash 8 z kodekiem On2 VP6 oraz wyjściem obrazu FLV, które można
-odtwarzać bezpośrednio w odtwarzaczu Flash, przekazywać strumieniem
-poprzez Adobe Flash Media Server lub importować do Flash Studio. Nowe
-wyjście FLV jest także w pełni zgodne z formatem metadanych FLV i
-standardami Adobe Flash Playera.
+Główną cechą silnika On2 Flix Engine 8 jest obsługa filmów Adobe Flash
+8 z kodekiem On2 VP6 oraz wyjściem obrazu FLV, które można odtwarzać
+bezpośrednio w odtwarzaczu Flash, przekazywać strumieniem poprzez
+Adobe Flash Media Server lub importować do Flash Studio. Nowe wyjście
+FLV jest także w pełni zgodne z formatem metadanych FLV i standardami
+Adobe Flash Playera.
 
 %package libs
 Summary:	Shared libraries for On2 Flix Engine
@@ -468,9 +467,8 @@ fi
 if [ ! -s %{_sysconfdir}/hostinfo ]; then
 	%{_sbindir}/on2_host_info > %{_sysconfdir}/hostinfo
 %banner -e %{name} <<EOF
-Put your username and serial key to %{_sysconfdir}/flixd-license.conf
-and invoke:
-%{_sbindir}/flixd-license-get
+Put your username and serial key to %{_sysconfdir}/flixd-license.conf and invoke:
+# %{_sbindir}/flixd-license-get
 
 You can register evaluation demo at <http://flix.on2.com/demos/>.
 EOF
