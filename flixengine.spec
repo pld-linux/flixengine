@@ -18,8 +18,8 @@
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
-Version:	8.0.11.0
-Release:	1
+Version:	8.0.13.0
+Release:	0.1
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -27,7 +27,7 @@ Group:		Applications
 # Source0Download:	http://flix.on2.com/demos/flixenginelinuxdemo.tar.gz
 %if %{with demo}
 Source0:	%{name}linuxdemo-%{version}.tar.gz
-# NoSource0-md5:	4b44ca7f3fa46ce2242396c8e94149ce
+# NoSource0-md5:	883d227eeeb4973f65c4c12aed6b0e02
 NoSource:	0
 %endif
 %if %{without demo}
@@ -40,7 +40,7 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Patch0:		%{name}-libdir.patch
 Patch1:		%{name}-phploader.patch
-URL:		http://www.on2.com/index.php?474
+URL:		http://support.on2.com/
 BuildRequires:	bash
 %{?with_java:BuildRequires:	jre}
 BuildRequires:	perl-base
@@ -66,12 +66,13 @@ Provides:	user(flixd)
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-# should not provide such deps
-%define		_noautoprov libavutil.so.49 libavformat.so.50 libavcodec.so.51
-# need to provide it for flixd, but we don't want package name dep here
-%define		_noautoreq %{_noautoprov}
-
 %define		_sysconfdir		/etc/on2
+
+# don't satisfy other packages for ffmpeg library deps (don't use %{name} here)
+%define		_noautoprovfiles    %{_prefix}/lib/flixd
+
+# and as we don't provide them, don't require either
+%define		_noautoreq		libavutil.so libavformat.so libavcodec.so
 
 %description
 The On2 Flix Engine provides many of the Flash 8 video encoding
@@ -187,6 +188,8 @@ Obsoletes:	flixengine-docs
 
 %description apidocs
 HTML API Documentation for On2 Flix Engine.
+
+Also available online at <http://support.on2.com/flixengine/linux/api/>.
 
 %description apidocs -l pl.UTF-8
 Dokumentacja HTML API dla silnika On2 Flix.
@@ -510,7 +513,7 @@ fi
 %attr(755,root,root) %{_prefix}/lib/flixd/libavcodec.so.*.*.*
 %attr(755,root,root) %{_prefix}/lib/flixd/libavcodec.so.51
 %attr(755,root,root) %{_prefix}/lib/flixd/libavformat.so.*.*.*
-%attr(755,root,root) %{_prefix}/lib/flixd/libavformat.so.51
+%attr(755,root,root) %{_prefix}/lib/flixd/libavformat.so.52
 %attr(755,root,root) %{_prefix}/lib/flixd/libavutil.so.*.*.*
 %attr(755,root,root) %{_prefix}/lib/flixd/libavutil.so.49
 %attr(755,root,root) %{_sbindir}/flixd
