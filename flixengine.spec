@@ -3,18 +3,30 @@
 %bcond_without	autodeps	# don't BR packages needed only for resolving deps
 %bcond_with	python		# do not build Python bindings
 %bcond_with	java		# do not build Java bindings
+%bcond_without	php		# do not build PHP bindings
+%bcond_without	perl	# do not build Perl bindings
 %bcond_with	tests		# perform "make test". needs running flixd on localhost
 %bcond_without	demo	# use production tarball (you need one too:))
-#
+%bcond_without	apis	# disable all apis, build just flixd
+%bcond_without	apidocs	# without apidocs
+
 %ifarch %{x8664}
 %undefine	with_python
 %undefine	with_java
 %endif
-#
+
+%if %{without apis}
+%undefine	with_python
+%undefine	with_java
+%undefine	with_php
+%undefine	with_perl
+%undefine	with_apidocs
+%endif
+
 %define		full_version	%{version}%{?with_demo:_DEMO}%{?_extra}
 %define		_extra	%{nil}
-#
-%include	/usr/lib/rpm/macros.perl
+
+%{?with_perl:%include	/usr/lib/rpm/macros.perl}
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
@@ -33,7 +45,7 @@ NoSource:	0
 %if %{without demo}
 # Source1Download:	http://flix.on2.com/flix/download/flix-engine-installer-linux-%{version}.tar.gz
 Source1:	flix-engine-installer-linux-%{version}%{?_extra}.tar.gz
-# NoSource1-md5:	8166b68c8956420003b7c98b521577a1
+# NoSource1-md5:	071ce081e735fffc4d95bc040cc263b2
 NoSource:	1
 %endif
 Source2:	%{name}.init
@@ -43,14 +55,17 @@ Patch1:		%{name}-phploader.patch
 URL:		http://support.on2.com/
 BuildRequires:	bash
 %{?with_java:BuildRequires:	jre}
-BuildRequires:	perl-base
-BuildRequires:	php-devel
+%{?with_perl:BuildRequires:	perl-base}
+%{?with_php:BuildRequires:	php-devel}
 %{?with_python:BuildRequires:	python}
-BuildRequires:	rpm-perlprov >= 4.1-13
+%{?with_perl:BuildRequires:	rpm-perlprov >= 4.1-13}
 BuildRequires:	rpmbuild(macros) >= 1.344
 %if %{with autodeps}
 BuildRequires:	ffmpeg-libs
 BuildRequires:	lame-libs
+%endif
+%if %{without demo} && "%{version}" == "8.0.13.0"
+BuildRequires:	flixengine-libs = %{version}
 %endif
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
@@ -266,6 +281,13 @@ s,INSTALLEDJAVAFILES="n",INSTALLEDJAVAFILES="y",
 # remove backups from patching as we use globs to package files to buildroot
 find flixsamples '(' -name '*~' -o -name '*.orig' ')' | xargs -r rm -v
 
+%if %{without demo} && "%{version}" == "8.0.13.0"
+# purchased version doesn't have 64bit library
+install -d testing/lib64
+ln -sf %{_libdir}/libflixengine2.so.* testing/lib64
+ln -sf libflixengine2.so.0 testing/lib64/libflixengine2.so
+%endif
+
 %build
 cd .flix-engine-installation-files
 PWD=$(pwd)
@@ -282,12 +304,13 @@ ldconfig -n flixlibs
 %endif
 export LIBRARY_PATH=$LD_LIBRARY_PATH
 
-# PHP
+%if %{with php}
 %{__make} -C flixphp \
 	CC="%{__cc}" \
 	-f target.mk
+%endif
 
-# Perl
+%if %{with perl}
 cd flixperl
 %{__perl} Makefile.PL \
 	INSTALLDIRS=vendor
@@ -296,6 +319,7 @@ cd flixperl
 	OPTIMIZE="%{rpmcflags}"
 %{?with_tests:%{__make} test}
 cd ..
+%endif
 
 %if %{with python}
 cd flixpython
@@ -311,7 +335,7 @@ cd ..
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{rc.d/init.d,sysconfig}
+install -d $RPM_BUILD_ROOT{/etc/{rc.d/init.d,sysconfig},%{_libdir}}
 
 ./install.sh \
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
@@ -343,7 +367,7 @@ install lget on2_host_info $RPM_BUILD_ROOT%{_sbindir}
 ln -snf %{_docdir}/on2/flixengine/html/c/cli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/c/README-cli.html
 
 # install bindings
-# PHP
+%if %{with php}
 %{__make} -C flixphp \
 	install \
 	PHPINST=%{php_extensiondir} \
@@ -358,8 +382,9 @@ EOF
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php
 ln -snf %{_docdir}/on2/flixengine/html/phpcgi.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-cgi.html
 ln -snf %{_docdir}/on2/flixengine/html/phpcli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-cli.html
+%endif
 
-# Perl
+%if %{with perl}
 cd flixperl
 %{__make} pure_install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -369,6 +394,7 @@ cd ..
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl
 ln -snf %{_docdir}/on2/flixengine/html/perlcgi.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl/README-cgi.html
 ln -snf %{_docdir}/on2/flixengine/html/perlcli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl/README-cli.html
+%endif
 
 %if %{with python}
 cd flixpython
@@ -395,6 +421,10 @@ ln -snf %{_prefix}/src/flixmodules/flixjava/doc $RPM_BUILD_ROOT%{_docdir}/on2/fl
 ln -snf %{_docdir}/on2/flixengine/html/javacli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/java/README-cli.html
 %endif
 
+%if %{without apidocs}
+rm -rf $RPM_BUILD_ROOT%{_docdir}/on2
+%endif
+
 %ifarch %{x8664}
 cp -a testing/lib64/libflixengine2.so* $RPM_BUILD_ROOT%{_libdir}
 # flixd linked statically and other libs are 64 bit
@@ -409,7 +439,7 @@ install supportlibs/libavcodec.so.* $RPM_BUILD_ROOT%{_prefix}/lib/flixd
 install supportlibs/libavutil.so.* $RPM_BUILD_ROOT%{_prefix}/lib/flixd
 ldconfig -n $RPM_BUILD_ROOT%{_prefix}/lib/flixd
 
-# avoid collision from mplayer package
+# avoid collision from mencoder package
 mv $RPM_BUILD_ROOT%{_bindir}/mencoder{,-flixengine}
 
 # do not put hardware fingerprint to rpm package
@@ -425,6 +455,7 @@ rm -f $RPM_BUILD_ROOT%{_sbindir}/flix-engine-uninstall.sh
 # make it somewhat easier to acquire license registration
 install -d $RPM_BUILD_ROOT%{_sysconfdir}
 cat > $RPM_BUILD_ROOT%{_sysconfdir}/flixd-license.conf <<'EOF'
+# vim:encoding=latin1
 FLIX_USERNAME='<username>'
 FLIX_SERIAL='<serial>'
 EOF
@@ -436,7 +467,7 @@ set -e
 
 . %{_sysconfdir}/flixd-license.conf
 if [ -z "$FLIX_USERNAME" -o -z "$FLIX_SERIAL" ]; then
-	echo >&2 "Please fill FLIX_USERNAME and FLIX_SERIAL!"
+	echo >&2 "$0: Please fill FLIX_USERNAME and FLIX_SERIAL!"
 	exit 1
 fi
 
@@ -565,6 +596,7 @@ fi
 %{_examplesdir}/%{name}-%{version}/java
 %endif
 
+%if %{with perl}
 %files -n perl-flixengine
 %defattr(644,root,root,755)
 %dir %{perl_vendorarch}/On2
@@ -574,13 +606,16 @@ fi
 %{perl_vendorarch}/auto/On2/flixengine2/flixengine2.bs
 %attr(755,root,root) %{perl_vendorarch}/auto/On2/flixengine2/flixengine2.so
 %{_examplesdir}/%{name}-%{version}/perl
+%endif
 
+%if %{with php}
 %files -n php-flixengine
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/flixengine.ini
 %attr(755,root,root) %{php_extensiondir}/flixengine2.so
 %{_prefix}/lib/flixengine2.php
 %{_examplesdir}/%{name}-%{version}/php
+%endif
 
 %if %{with python}
 %files -n python-flixengine
@@ -591,6 +626,8 @@ fi
 %{_examplesdir}/%{name}-%{version}/python
 %endif
 
+%if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
 %{_docdir}/on2
+%endif
