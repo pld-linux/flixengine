@@ -26,7 +26,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.13.0
-Release:	0.3
+Release:	0.4
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -274,11 +274,11 @@ s,clear 2>\$nullout,#&,
 # and somewhy --no-compile didn not work, had to specify also --no-modules,
 # which made no modules installed either, chicken-egg problem.
 s,COMPILEMODULES=y,COMPILEMODULES=n,
-s,^INSTALLEDPERLFILES=.*,INSTALLEDPERLFILES="y",
-s,^INSTALLEDPHPFILES=.*,INSTALLEDPHPFILES="y",
-s,^INSTALLEDPYTHONFILES=.*,INSTALLEDPYTHONFILES="y",
 s,^INSTALLEDFLIXLIBRARIES=.*,INSTALLEDFLIXLIBRARIES="y",
-s,^INSTALLEDJAVAFILES=.*,INSTALLEDJAVAFILES="y",
+%{?with_perl:"s,^INSTALLEDPERLFILES=.*,INSTALLEDPERLFILES="y",}
+%{?with_php:s,^INSTALLEDPHPFILES=.*,INSTALLEDPHPFILES="y",}
+%{?with_python:s,^INSTALLEDPYTHONFILES=.*,INSTALLEDPYTHONFILES="y",}
+%{?with_java:s,^INSTALLEDJAVAFILES=.*,INSTALLEDJAVAFILES="y",}
 
 ' install.sh
 
@@ -367,8 +367,13 @@ ln -s codecs $RPM_BUILD_ROOT%{_prefix}/lib/win32
 cd .flix-engine-installation-files
 install lget on2_host_info $RPM_BUILD_ROOT%{_sbindir}
 
-# symlink without buildroot
-ln -snf %{_docdir}/on2/flixengine/html/c/cli.html $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/c/README-cli.html
+# symlink outside package, install apidoc to read all docs
+rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/c/README-cli.html
+rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl/README-{cgi,cli}.html
+rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-{cgi,cli}.html
+rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/python/README-{cgi,cli}.html
+rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/java/README-cli.html
+rm -f $RPM_BUILD_ROOT%{_docdir}/on2/flixengine/javadoc
 
 # install bindings
 %if %{with php}
@@ -383,8 +388,6 @@ cat <<'EOF' > $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d/flixengine.ini
 ;extension=flixengine2.so
 EOF
 
-# symlink outside package, install apidoc package to read all docs
-rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/php/README-{cgi,cli}.html
 # per package dirs
 mv $RPM_BUILD_ROOT%{_examplesdir}/{%{name}-%{version}/php,php-%{name}-%{version}}
 %endif
@@ -395,8 +398,6 @@ cd flixperl
 	DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/auto/On2/flixengine2/.packlist
 cd ..
-# symlink outside package, install apidoc package to read all docs
-rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/perl/README-{cgi,cli}.html
 # per package dirs
 mv $RPM_BUILD_ROOT%{_examplesdir}/{%{name}-%{version}/perl,perl-%{name}-%{version}}
 %endif
@@ -408,8 +409,6 @@ cd flixpython
 	--root=$RPM_BUILD_ROOT
 %py_postclean
 cd ..
-# symlink outside package, install apidoc to read all docs
-rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/python/README-{cgi,cli}.html
 # per package dirs
 mv $RPM_BUILD_ROOT%{_examplesdir}/{%{name}-%{version}/python,python-%{name}-%{version}}
 %endif
@@ -421,9 +420,6 @@ mv $RPM_BUILD_ROOT%{_examplesdir}/{%{name}-%{version}/python,python-%{name}-%{ve
 	install \
 	-f target.mk
 
-# symlink outside package, install apidoc to read all docs
-rm -f $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}/java/README-cli.html
-rm -f $RPM_BUILD_ROOT%{_docdir}/on2/flixengine/javadoc
 # per package dirs
 mv $RPM_BUILD_ROOT%{_examplesdir}/{%{name}-%{version}/java,java-%{name}-%{version}}
 %endif
