@@ -5,7 +5,7 @@
  # add extension_dir/.. to 'include_path' as this is often missing from php.ini
  set_include_path(get_include_path().PATH_SEPARATOR.ini_get("extension_dir")."/..");
 -$flixphp = 'flixengine2.php';
-+$flixphp = '/usr/lib/flixengine2.php';
++$flixphp = '/usr/share/php/flixengine2.php';
  echo 'Loading flix: ' . $flixphp . "\n<br>";
  include ($flixphp);
  
@@ -16,7 +16,7 @@
  
  # Load the FlixEngine module
 -$flixphp = 'flixengine2.php';
-+$flixphp = '/usr/lib/flixengine2.php';
++$flixphp = '/usr/share/php/flixengine2.php';
  echo 'Loading flix: ' . $flixphp . "\n";
  # If this include fails you may need to edit you include_path variable in
  # your php.ini file.
@@ -27,7 +27,27 @@
  set_include_path(get_include_path().PATH_SEPARATOR.ini_get("extension_dir")."/..");
  
 -$incret     = include ('flixengine2.php');
-+$incret     = include ('/usr/lib/flixengine2.php');
++$incret     = require_once '/usr/share/php/flixengine2.php';
  $prefix     = "/var/www/cgi-bin/";
  $indir      = $prefix."flixmedia/in/";
  $overlaydir = $prefix."flixmedia/overlay/";
+--- flix-engine-installer-linux-8.0.13.0/.flix-engine-installation-files/flixphp/target.mk~	2008-10-25 18:44:21.000000000 +0300
++++ flix-engine-installer-linux-8.0.13.0/.flix-engine-installation-files/flixphp/target.mk	2008-10-28 23:52:01.124921220 +0200
+@@ -23,14 +23,15 @@
+ 
+ PHPINCS := $(shell php-config --includes)
+ PHPINST := $(shell php-config --extension-dir)
++PHPLIB  := /usr/share/php
+ $(PHPWRAP_SO): $(PHPWRAP_C)
+ 	$(CC) $(CFLAGS) $(PHPINCS) -shared $(PHPWRAP_C) \
+               -lflixengine2 -o $(PHPWRAP_SO) 
+ 
+ install:
+-	mkdir -p $(DESTDIR)$(PHPINST)
++	mkdir -p $(DESTDIR)$(PHPINST) $(DESTDIR)$(PHPLIB)
+ 	install -p $(PHPWRAP_SO) $(DESTDIR)$(PHPINST)
+-	install -p $(PHPWRAP_PHP) $(DESTDIR)/usr/lib
++	install -p $(PHPWRAP_PHP) $(DESTDIR)$(PHPLIB)
+     
+ clean:
+ 	$(RM) -f $(PHPWRAP_SO)
