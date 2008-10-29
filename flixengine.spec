@@ -26,7 +26,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.13.0
-Release:	0.4
+Release:	1
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -275,7 +275,7 @@ s,clear 2>\$nullout,#&,
 # which made no modules installed either, chicken-egg problem.
 s,COMPILEMODULES=y,COMPILEMODULES=n,
 s,^INSTALLEDFLIXLIBRARIES=.*,INSTALLEDFLIXLIBRARIES="y",
-%{?with_perl:"s,^INSTALLEDPERLFILES=.*,INSTALLEDPERLFILES="y",}
+%{?with_perl:s,^INSTALLEDPERLFILES=.*,INSTALLEDPERLFILES="y",}
 %{?with_php:s,^INSTALLEDPHPFILES=.*,INSTALLEDPHPFILES="y",}
 %{?with_python:s,^INSTALLEDPYTHONFILES=.*,INSTALLEDPYTHONFILES="y",}
 %{?with_java:s,^INSTALLEDJAVAFILES=.*,INSTALLEDJAVAFILES="y",}
