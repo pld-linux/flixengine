@@ -26,7 +26,7 @@ Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
 Version:	8.0.13.0
-Release:	1
+Release:	2
 License:	(probably) not distributable
 Group:		Applications
 # download demo from http://flix.on2.com/demos/
@@ -40,7 +40,7 @@ NoSource:	0
 %if %{without demo}
 # Source1Download:	http://flix.on2.com/flix/download/flix-engine-installer-linux-%{version}.tar.gz
 Source1:	flix-engine-installer-linux-%{version}%{?_extra}.tar.gz
-# NoSource1-md5:	071ce081e735fffc4d95bc040cc263b2
+# NoSource1-md5:	60fd126a8d4aa81d286d6ea534a11f08
 NoSource:	1
 %endif
 Source2:	%{name}.init
@@ -284,13 +284,6 @@ s,^INSTALLEDFLIXLIBRARIES=.*,INSTALLEDFLIXLIBRARIES="y",
 
 # remove backups from patching as we use globs to package files to buildroot
 find flixsamples '(' -name '*~' -o -name '*.orig' ')' | xargs -r rm -v
-
-%if %{without demo} && "%{version}" == "8.0.13.0"
-# purchased version doesn't have 64bit library
-install -d testing/lib64
-ln -sf %{_libdir}/libflixengine2.so.* testing/lib64
-ln -sf libflixengine2.so.0 testing/lib64/libflixengine2.so
-%endif
 
 %build
 cd .flix-engine-installation-files
