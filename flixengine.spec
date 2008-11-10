@@ -49,11 +49,12 @@ Patch0:		%{name}-libdir.patch
 Patch1:		%{name}-phploader.patch
 URL:		http://support.on2.com/
 BuildRequires:	bash
-%{?with_java:BuildRequires:	jre}
+%{?with_java:BuildRequires:	jdk}
 %{?with_perl:BuildRequires:	perl-base}
 %{?with_php:BuildRequires:	php-devel}
-%{?with_python:BuildRequires:	python}
+%{?with_python:BuildRequires:	python-devel}
 %{?with_perl:BuildRequires:	rpm-perlprov >= 4.1-13}
+%{?with_python:BuildRequires:	rpm-pythonprov}
 BuildRequires:	rpmbuild(macros) >= 1.344
 %if %{with autodeps}
 BuildRequires:	ffmpeg-libs
@@ -332,7 +333,7 @@ cd ..
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{rc.d/init.d,sysconfig},%{_libdir}}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},/etc/{rc.d/init.d,sysconfig},%{_libdir}}
 
 ./install.sh \
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
@@ -617,6 +618,9 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{py_sitedir}/_flixengine2.so
 %{py_sitedir}/flixengine2.py[co]
+%if "%{py_ver}" > "2.4"
+%{py_sitedir}/flixengine2-*.egg-info
+%endif
 %{_examplesdir}/python-%{name}-%{version}
 %endif
 
