@@ -558,7 +558,7 @@ fi
 
 %{_mandir}/man8/flixd.8*
 %dir %attr(771,root,flixd) /var/run/flixd
-%ghost %attr(660,root,flixd) /var/log/flixd.log
+%attr(660,root,flixd) %ghost /var/log/flixd.log
 %attr(755,root,root) %{_bindir}/mencoder-flixengine
 
 %files libs
