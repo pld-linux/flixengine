@@ -321,7 +321,7 @@ cd ..
 
 %if %{with python}
 cd flixpython
-%{__python} setup.py build
+%py_build
 cd ..
 %endif
 
@@ -398,9 +398,7 @@ mv $RPM_BUILD_ROOT%{_examplesdir}/{%{name}-%{version}/perl,perl-%{name}-%{versio
 
 %if %{with python}
 cd flixpython
-%{__python} setup.py install \
-	--optimize=2 \
-	--root=$RPM_BUILD_ROOT
+%py_install
 %py_postclean
 cd ..
 # per package dirs
