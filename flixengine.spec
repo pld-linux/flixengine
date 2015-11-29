@@ -55,7 +55,7 @@ BuildRequires:	bash
 %{?with_python:BuildRequires:	python-devel}
 %{?with_perl:BuildRequires:	rpm-perlprov >= 4.1-13}
 %{?with_python:BuildRequires:	rpm-pythonprov}
-BuildRequires:	rpmbuild(macros) >= 1.344
+BuildRequires:	rpmbuild(macros) >= 1.710
 %if %{with autodeps}
 BuildRequires:	ffmpeg-libs
 BuildRequires:	lame-libs
