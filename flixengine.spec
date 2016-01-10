@@ -205,6 +205,9 @@ Summary:	HTML API Documentation for On2 Flix Engine
 Summary(pl.UTF-8):	Dokumentacja HTML API dla silnika On2 Flix
 Group:		Documentation
 Obsoletes:	flixengine-docs
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description apidocs
 HTML API Documentation for On2 Flix Engine.
