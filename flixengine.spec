@@ -21,7 +21,6 @@
 %define		full_version	%{version}%{?with_demo:_DEMO}%{?_extra}
 %define		_extra	%{nil}
 
-%{?with_perl:%include	/usr/lib/rpm/macros.perl}
 Summary:	On2 Flix Engine
 Summary(pl.UTF-8):	Silnik On2 Flix
 Name:		flixengine
